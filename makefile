@@ -32,7 +32,7 @@ cc=gcc
 c_flags=-O3 -I${directory_include} -I${directory_cexil_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include}
 
 strip=strip
-strip_flags=-u -r
+strip_flags=-x
 
 all: ${file_output}
 
