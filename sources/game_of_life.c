@@ -1,33 +1,46 @@
 #include <game_of_life.h>
 
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <gol_parameters.h>
 
 #include <cexil.h>
 #include <interrupt_handler.h>
 
-int main() {
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+int main(
+  int length_parameters,
+  char** parameters
+) {
+  struct gol_parameters gol_parameters;
+
+  unsigned char status_gol_parameters_parse = gol_parameters_parse(
+    &gol_parameters,
+    length_parameters,
+    parameters
+  );
+
+  if (
+    status_gol_parameters_parse != 0
+  ) {
+    return 1;
+  }
+
   interrupt_handler_initialize();
 
   srand(time((void*)0));
-
-  struct cexil_size size_bounding_area;
-
-  cexil_size_set_to_terminal(
-    &size_bounding_area
-  );
 
   struct cexil_renderer renderer;
 
   cexil_renderer_initialize(
     &renderer,
-    &size_bounding_area
+    &gol_parameters.size_renderer
   );
 
   cexil_renderer_target_frame_rate_set(
     &renderer,
-    60.0f
+    gol_parameters.rate_frames
   );
 
   for (
