@@ -4,7 +4,7 @@ directory_cexil=${CEXIL_DIRECTORY}
 directory_cexil_include=${directory_cexil}/include
 directory_cexil_library=${directory_cexil}/library
 
-directory_clic3=../../c/clic3
+directory_clic3=${CLIC3_DIRECTORY}
 directory_clic3_include=${directory_clic3}/include
 directory_clic3_library=${directory_clic3}/library
 

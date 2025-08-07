@@ -17,6 +17,11 @@ jobs:
         with:
           repository: alic3dev/cexil
           path: cexil
+      - name: checkout_clic3
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/clic3
+          path: clic3
       - name: checkout_interrupt_handler
         uses: actions/checkout@v4
         with:
@@ -27,4 +32,4 @@ jobs:
       - name: make_interrupt_handler
         run: cd interrupt_handler && make
       - name: make_game_of_life
-        run: cd game_of_life && CEXIL_DIRECTORY=../cexil INTERRUPT_HANDLER_DIRECTORY=../interrupt_handler make
+        run: cd game_of_life && CEXIL_DIRECTORY=../cexil CLIC3_DIRECTORY=../clic3 INTERRUPT_HANDLER_DIRECTORY=../interrupt_handler make
