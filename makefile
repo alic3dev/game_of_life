@@ -1,14 +1,14 @@
 name=game_of_life
 
-directory_cexil=${CEXIL_DIRECTORY}
+directory_cexil:=${directory_cexil}
 directory_cexil_include=${directory_cexil}/include
 directory_cexil_library=${directory_cexil}/library
 
-directory_clic3=${CLIC3_DIRECTORY}
+directory_clic3:=${directory_clic3}
 directory_clic3_include=${directory_clic3}/include
 directory_clic3_library=${directory_clic3}/library
 
-directory_interrupt_handler=${INTERRUPT_HANDLER_DIRECTORY}
+directory_interrupt_handler:=${directory_interrupt_handler}
 directory_interrupt_handler_include=${directory_interrupt_handler}/include
 directory_interrupt_handler_library=${directory_interrupt_handler}/library
 
