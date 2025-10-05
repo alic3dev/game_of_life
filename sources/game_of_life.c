@@ -1,6 +1,6 @@
 #include <game_of_life.h>
 
-#include <gol_parameters.h>
+#include <game_of_life_parameters.h>
 
 #include <cexil.h>
 #include <interrupt_handler.h>
@@ -13,16 +13,16 @@ int main(
   int length_parameters,
   char** parameters
 ) {
-  struct gol_parameters gol_parameters;
+  struct game_of_life_parameters game_of_life_parameters;
 
-  unsigned char status_gol_parameters_parse = gol_parameters_parse(
-    &gol_parameters,
+  unsigned char status_game_of_life_parameters_parse = game_of_life_parameters_parse(
+    &game_of_life_parameters,
     length_parameters,
     parameters
   );
 
   if (
-    status_gol_parameters_parse != 0
+    status_game_of_life_parameters_parse != 0
   ) {
     return 1;
   }
@@ -35,12 +35,12 @@ int main(
 
   cexil_renderer_initialize(
     &renderer,
-    &gol_parameters.size_renderer
+    &game_of_life_parameters.size_renderer
   );
 
   cexil_renderer_target_frame_rate_set(
     &renderer,
-    gol_parameters.rate_frames
+    game_of_life_parameters.rate_frames
   );
 
   for (

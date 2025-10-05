@@ -1,4 +1,4 @@
-#include <gol_parameters.h>
+#include <game_of_life_parameters.h>
 
 #include <clic3.h>
 
@@ -6,18 +6,18 @@
 
 const char message_parameter_already_set[] = "parameter->{%s}.already_set\n";
 
-unsigned char gol_parameters_parse(
-  struct gol_parameters* gol_parameters,
+unsigned char game_of_life_parameters_parse(
+  struct game_of_life_parameters* game_of_life_parameters,
   int length_parameters,
   char** parameters
 ) {
   cexil_size_set_to_terminal(
-    &gol_parameters->size_renderer
+    &game_of_life_parameters->size_renderer
   );
 
-  gol_parameters->size_offset.width = 0;
-  gol_parameters->size_offset.height = 0;
-  gol_parameters->rate_frames = 60.0f;
+  game_of_life_parameters->size_offset.width = 0;
+  game_of_life_parameters->size_offset.height = 0;
+  game_of_life_parameters->rate_frames = 60.0f;
 
   unsigned char has_set_size_x = 0;
   unsigned char has_set_size_y = 0;
@@ -69,7 +69,7 @@ unsigned char gol_parameters_parse(
 
         unsigned char status_int_conversion = clic3_char_array_to_unsigned_int(
           parameters[index_parameter],
-          &gol_parameters->size_renderer.width
+          &game_of_life_parameters->size_renderer.width
         );
 
         if (
@@ -103,7 +103,7 @@ unsigned char gol_parameters_parse(
 
         unsigned char status_int_conversion = clic3_char_array_to_unsigned_int(
           parameters[index_parameter],
-          &gol_parameters->size_renderer.height
+          &game_of_life_parameters->size_renderer.height
         );
 
         if (
@@ -137,7 +137,7 @@ unsigned char gol_parameters_parse(
  
         unsigned char status_float_conversion = clic3_char_array_to_float(
           parameters[index_parameter],
-          &gol_parameters->rate_frames
+          &game_of_life_parameters->rate_frames
         );
 
         if (
