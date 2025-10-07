@@ -1,6 +1,38 @@
 #include <game_of_life.h>
 
 #include <game_of_life_parameters.h>
+#include <game_of_life_poll.h>
+
+#if rendering_mode == 3
+
+#include <game_of_life_3d_initialize.h>
+
+int main(
+  int length_parameters,
+  const char** parameters
+) {
+  struct game_of_life_parameters game_of_life_parameters;
+
+  unsigned char status_game_of_life_parameters_parse = game_of_life_parameters_parse(
+    &game_of_life_parameters,
+    length_parameters,
+    parameters
+  );
+
+  if (
+    status_game_of_life_parameters_parse != 0
+  ) {
+    return 1;
+  }
+
+  return game_of_life_3d_initialize(
+    length_parameters,
+    parameters,
+    game_of_life_parameters
+  );
+}
+
+#elif rendering_mode == 2
 
 #include <cexil.h>
 #include <interrupt_handler.h>
@@ -92,3 +124,5 @@ int main(
 
   return 0;
 }
+
+#endif
