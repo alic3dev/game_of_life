@@ -44,6 +44,15 @@ make
 - - `2d`: renders in `2d` using [`cexil`](https://github.com/alic3dev/cexil)
 - - `3d`: renders in `3d` using [`metil`](https://github.com/alic3dev/metil)
 
+##### example
+
+```sh
+make with_metal=0 rendering_mode=3d; : renders in 3d without metal acceleration
+make with_metal=1 rendering_mode=2d; : renders in 2d with metal acceleration
+make rendering_mode=3d;              : renders in 3d without metal acceleration
+make with_metal=1;                   : renders in 2d with metal acceleration
+```
+
 ### cleaning
 
 ```sh
