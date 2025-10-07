@@ -37,7 +37,7 @@ make
 
 #### compilation_options
 
-- `with_metal`: default->{`0`};
+- `with_metal`: default->{`0`}; (WIP)
 - - `0`: disables metal acceleration for computation
 - - `1`: enables metal acceleration for computation
 - `rendering_mode`: default->{`2d`};
