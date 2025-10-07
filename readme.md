@@ -2,7 +2,13 @@
 
 implementation.of->{`game_of_life`}.utilizing->{[`cexil`](https://github.com/alic3dev/cexil)};
 
-<img width="1377" alt="game_of_life" src="https://github.com/user-attachments/assets/29e4873d-3a05-4bb6-8392-3f92534531cb" />
+### 2d
+
+<img width="1377" alt="game_of_life:2d" src="https://github.com/user-attachments/assets/29e4873d-3a05-4bb6-8392-3f92534531cb" />
+
+### 3d
+
+<img width="1966" height="1250" alt="game_of_life:3d" src="https://github.com/user-attachments/assets/efd1b259-c365-45d1-b45c-cd208ca61a79" />
 
 ## running
 
