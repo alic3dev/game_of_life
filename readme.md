@@ -35,6 +35,15 @@ make run
 make
 ```
 
+#### compilation_options
+
+- `with_metal`: default->{`0`};
+- - `0`: disables metal acceleration for computation
+- - `1`: enables metal acceleration for computation
+- `rendering_mode`: default->{`2d`};
+- - `2d`: renders in `2d` using [`cexil`](https://github.com/alic3dev/cexil)
+- - `3d`: renders in `3d` using [`metil`](https://github.com/alic3dev/metil)
+
 ### cleaning
 
 ```sh
