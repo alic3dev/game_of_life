@@ -6,7 +6,7 @@ on:
     branches: ["core"]
 jobs:
   continuous_integration_build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: checkout_game_of_life
         uses: actions/checkout@v4
@@ -27,11 +27,27 @@ jobs:
         with:
           repository: alic3dev/interrupt_handler
           path: interrupt_handler
+      - name: checkout_math_c
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/math_c
+          path: math_c
+      - name: checkout_metil
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/metil
+          path: metil
       - name: make_cexil
         run: cd cexil && make
       - name: make_clic3
         run: cd clic3 && make
       - name: make_interrupt_handler
         run: cd interrupt_handler && make
-      - name: make_game_of_life
-        run: cd game_of_life && directory_cexil=../cexil directory_clic3=../clic3 directory_interrupt_handler=../interrupt_handler make
+      - name: make_game_of_life_2d
+        run: cd game_of_life && make
+      - name: make_game_of_life_2d_with_metal
+        run: cd game_of_life && with_metal=1 make
+      - name: make_game_of_life_3d
+        run: cd game_of_life && rendering_mode=3d make
+      - name: make_game_of_life_3d_with_metal
+        run: cd game_of_life && rendering_mode=3d with_metal=1 make
