@@ -6,12 +6,11 @@
 #include <interrupt_handler.h>
 
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
 int main(
   int length_parameters,
-  char** parameters
+  const char** parameters
 ) {
   struct game_of_life_parameters game_of_life_parameters;
 
