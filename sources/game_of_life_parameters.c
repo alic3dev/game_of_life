@@ -1,5 +1,9 @@
 #include <game_of_life_parameters.h>
 
+#if rendering_mode == 2
+#include <cexil.h>
+#endif
+
 #include <clic3.h>
 
 #include <stdio.h>
@@ -9,14 +13,24 @@ const char message_parameter_already_set[] = "parameter->{%s}.already_set\n";
 unsigned char game_of_life_parameters_parse(
   struct game_of_life_parameters* game_of_life_parameters,
   int length_parameters,
-  char** parameters
+  const char** parameters
 ) {
+  #if rendering_mode == 2
+  struct cexil_size size_renderer;
+  
   cexil_size_set_to_terminal(
-    &game_of_life_parameters->size_renderer
+    &size_renderer
   );
 
-  game_of_life_parameters->size_offset.width = 0;
-  game_of_life_parameters->size_offset.height = 0;
+  game_of_life_parameters->size.x = size_renderer.width;
+  game_of_life_parameters->size.y = size_renderer.height;
+  #else
+  game_of_life_parameters->size.x = 300;
+  game_of_life_parameters->size.y = 200;
+  #endif
+
+  game_of_life_parameters->offset.x = 0;
+  game_of_life_parameters->offset.y = 0;
   game_of_life_parameters->rate_frames = 60.0f;
 
   unsigned char has_set_size_x = 0;
@@ -29,7 +43,7 @@ unsigned char game_of_life_parameters_parse(
     ++index_parameter
   ) {
     int index_parameter_supplied = clic3_char_arrays_within(
-      parameters[index_parameter],
+      (char*) parameters[index_parameter],
       3,
       "--size-x",
       "--size-y",
@@ -68,8 +82,8 @@ unsigned char game_of_life_parameters_parse(
         );
 
         unsigned char status_int_conversion = clic3_char_array_to_unsigned_int(
-          parameters[index_parameter],
-          &game_of_life_parameters->size_renderer.width
+          (char*) parameters[index_parameter],
+          &game_of_life_parameters->size.x
         );
 
         if (
@@ -102,8 +116,8 @@ unsigned char game_of_life_parameters_parse(
         );
 
         unsigned char status_int_conversion = clic3_char_array_to_unsigned_int(
-          parameters[index_parameter],
-          &game_of_life_parameters->size_renderer.height
+          (char*) parameters[index_parameter],
+          &game_of_life_parameters->size.y
         );
 
         if (
@@ -136,7 +150,7 @@ unsigned char game_of_life_parameters_parse(
         );
  
         unsigned char status_float_conversion = clic3_char_array_to_float(
-          parameters[index_parameter],
+          (char*) parameters[index_parameter],
           &game_of_life_parameters->rate_frames
         );
 
@@ -167,4 +181,3 @@ unsigned char game_of_life_parameters_parse(
 
   return 0;
 }
-
