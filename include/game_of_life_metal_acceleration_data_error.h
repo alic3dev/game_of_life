@@ -1,0 +1,22 @@
+#ifndef __game_of_life_metal_acceleration_data_error_h
+#define __game_of_life_metal_acceleration_data_error_h
+
+#define game_of_life_metal_acceleration_data_error_length 5
+
+enum game_of_life_metal_acceleration_data_error {
+  game_of_life_metal_acceleration_data_error_none = 0,
+  game_of_life_metal_acceleration_data_error_create_metal_device = 1,
+  game_of_life_metal_acceleration_data_error_create_library = 2,
+  game_of_life_metal_acceleration_data_error_create_function_compute = 3,
+  game_of_life_metal_acceleration_data_error_create_pipeline = 4
+};
+
+extern const char* game_of_life_metal_acceleration_data_error_description[
+  game_of_life_metal_acceleration_data_error_length
+];
+
+void game_of_life_metal_acceleration_data_error_print(
+  enum game_of_life_metal_acceleration_data_error
+);
+
+#endif
