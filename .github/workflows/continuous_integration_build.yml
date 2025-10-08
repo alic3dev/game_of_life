@@ -8,6 +8,8 @@ jobs:
   continuous_integration_build:
     runs-on: macos-latest
     steps:
+      - name: git_initialization
+        run: git config --global init.defaultBranch core
       - name: checkout_game_of_life
         uses: actions/checkout@v4
         with:
