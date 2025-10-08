@@ -11,7 +11,12 @@ struct game_of_life_metal_acceleration_data {
   void* command_queue;
   void* buffer_cells;
   void* buffer_cells_next;
+  void* buffer_living_neighbors;
   void* buffer_size;
+
+  char* cells;
+  char* living_neighbors;
+  
   enum game_of_life_metal_acceleration_data_error error;
 };
 

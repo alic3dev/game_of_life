@@ -244,6 +244,11 @@ c_flags_c:=${c_flags_c} -Dwith_metal=1
 c_flags_objective_c:=${c_flags_objective_c} -Dwith_metal=1
 endif
 
+ifdef rate_poll
+c_flags_c:=${c_flags_c} -Drate_poll=${rate_poll}
+c_flags_objective_c:=${c_flags_objective_c} -Drate_poll=${rate_poll}
+endif
+
 strip=strip
 strip_flags=-x
 

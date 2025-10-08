@@ -12,13 +12,61 @@ implementation.of->{`game_of_life`}.utilizing->{[`cexil`](https://github.com/ali
 
 ## running
 
+### 2d
+
 ```sh
-./output/game_of_life
+./output/release/2d/game_of_life
 ```
 
 ```sh
-make run
+make run rendering_mode=2d
 ```
+
+#### metal_accelerated
+
+```sh
+./output/release/2d_metal_accelerated/game_of_life_2d_metal_accelerated
+```
+
+```sh
+make run rendering_mode=2d with_metal=1
+```
+
+### 3d
+
+```sh
+./output/release/3d/game_of_life_3d.app/Contents/MacOS/game_of_life_3d
+```
+
+```sh
+make run rendering_mode=3d
+```
+
+#### metal_accelerated
+
+```sh
+./output/release/3d_metal_accelerated/game_of_life_3d_metal_accelerated.app/Contents/MacOS/game_of_life_3d_metal_accelerated
+```
+
+```sh
+make run rendering_mode=3d with_metal=1
+```
+
+### parameters
+
+#### \[2d|3d\]
+
+- `--size-x`: sets the cell grid width
+- `--size-y`: sets the cell grid height
+- `--rate-poll`: sets the rate in frames at which the cell grid is polled
+
+#### 2d
+
+- `--frame-rate`: sets the frame rate
+
+#### 3d
+
+- `--audio`: enables audio output from buffered cell grid
 
 ## development
 
@@ -79,7 +127,7 @@ make
 - `rendering_mode`: default->{`2d`};
 - - `2d`: renders in `2d` using [`cexil`](https://github.com/alic3dev/cexil)
 - - `3d`: renders in `3d` using [`metil`](https://github.com/alic3dev/metil)
-- `with_metal`: default->{`0`}; (WIP)
+- `with_metal`: default->{`0`};
 - - `0`: disables metal acceleration for computation
 - - `1`: enables metal acceleration for computation
 
