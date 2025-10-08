@@ -4,7 +4,6 @@
 #include <game_of_life_poll.h>
 
 #if rendering_mode == 3
-
 #include <game_of_life_3d_initialize.h>
 
 int main(
@@ -36,6 +35,8 @@ int main(
 #if with_metal == 1
 #include <game_of_life_metal_acceleration.h>
 #include <game_of_life_metal_acceleration_data.h>
+
+#include <clic3_bytes.h>
 #endif
 
 #include <cexil.h>
@@ -134,7 +135,8 @@ int main(
   };
 
   game_of_life_metal_acceleration_initialize(
-    &game_of_life_metal_acceleration_data
+    &game_of_life_metal_acceleration_data,
+    &game_of_life_parameters
   );
 
   if (
@@ -149,10 +151,14 @@ int main(
     game_of_life_destroy(
       &renderer,
       &game_of_life_parameters,
-      cells_next,
       &game_of_life_metal_acceleration_data
     );
   }
+
+  unsigned long int length_cells = (
+    game_of_life_parameters.size.x *
+    game_of_life_parameters.size.y
+  );
   #endif
 
   while (interrupt_handler_interrupted == 0) {
@@ -160,20 +166,44 @@ int main(
       &renderer
     );
 
+    #if with_metal == 1
+    char* cells = game_of_life_metal_acceleration_compute(
+      &game_of_life_metal_acceleration_data,
+      &game_of_life_parameters
+    );
+
+    for (
+      unsigned long int index_cell = 0;
+      index_cell < length_cells;
+      index_cell = (
+        index_cell +
+        game_of_life_parameters.size.x
+      )
+    ) {
+      clic3_bytes_copy(
+        renderer.pixels[index_cell / game_of_life_parameters.size.x],
+        cells + index_cell, (
+          sizeof(unsigned char) *
+          game_of_life_parameters.size.x
+        )
+      );
+    }
+    #else
     game_of_life_poll(
       &game_of_life_parameters,
       renderer.pixels,
       cells_next
     );
+    #endif
   }
 
   game_of_life_destroy(
     &renderer,
     &game_of_life_parameters,
-    cells_next
     #if with_metal == 1
-    ,
     &game_of_life_metal_acceleration_data
+    #else
+    cells_next
     #endif
   );
 
@@ -183,10 +213,10 @@ int main(
 void game_of_life_destroy(
   struct cexil_renderer* renderer,
   struct game_of_life_parameters* game_of_life_parameters,
-  char** cells_next
   #if with_metal == 1
-  ,
   struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data
+  #else
+  char** cells_next
   #endif
 ) {
   cexil_renderer_destroy(
@@ -197,8 +227,7 @@ void game_of_life_destroy(
   game_of_life_metal_acceleration_destroy(
     game_of_life_metal_acceleration_data
   );
-  #endif
-
+  #else
   for (
     unsigned int index_y = 0;
     index_y < game_of_life_parameters->size.y;
@@ -214,6 +243,7 @@ void game_of_life_destroy(
   free(
     cells_next
   );
+  #endif
 }
 
 #endif

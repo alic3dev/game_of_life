@@ -8,6 +8,10 @@ struct game_of_life_metal_acceleration_data {
   void* library;
   void* function_compute;
   void* pipeline_state_compute;
+  void* command_queue;
+  void* buffer_cells;
+  void* buffer_cells_next;
+  void* buffer_size;
   enum game_of_life_metal_acceleration_data_error error;
 };
 

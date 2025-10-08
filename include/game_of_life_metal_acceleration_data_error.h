@@ -8,7 +8,9 @@ enum game_of_life_metal_acceleration_data_error {
   game_of_life_metal_acceleration_data_error_create_metal_device = 1,
   game_of_life_metal_acceleration_data_error_create_library = 2,
   game_of_life_metal_acceleration_data_error_create_function_compute = 3,
-  game_of_life_metal_acceleration_data_error_create_pipeline = 4
+  game_of_life_metal_acceleration_data_error_create_pipeline = 4,
+  game_of_life_metal_acceleration_data_error_create_command_queue = 5,
+  game_of_life_metal_acceleration_data_error_create_buffer = 6
 };
 
 extern const char* game_of_life_metal_acceleration_data_error_description[

@@ -20,10 +20,10 @@ int main(
 void game_of_life_destroy(
   struct cexil_renderer*,
   struct game_of_life_parameters*,
-  char**
   #if with_metal == 1
-  ,
   struct game_of_life_metal_acceleration_data*
+  #else
+  char**
   #endif
 );
 #endif
