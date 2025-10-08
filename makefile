@@ -15,14 +15,18 @@ endif
 endif
 endif
 
+ifndef debug
+debug=0
+endif
+
 name:=${name}_${rendering_mode}
 
 ifeq (${debug}, 1)
-	name:=${name}_debug
-	directory_objects=${directory_objects_base}/debug
-	directory_output=${directory_output_base}/debug
+name:=${name}_debug
+directory_objects=${directory_objects_base}/debug
+directory_output=${directory_output_base}/debug
 else
-	directory_output=${directory_output_base}/release
+directory_output=${directory_output_base}/release
 endif
 
 directory_objects:=${directory_objects}/${rendering_mode}
@@ -135,11 +139,11 @@ directory_math_c_include=${directory_math_c}/include
 directory_metil_include=${directory_metil}/include
 
 ifeq (${debug}, 1)
-	directory_metil_library=${directory_metil}/library_debug
-	file_metil_library=${directory_metil_library}/metil_debug.o
+directory_metil_library=${directory_metil}/library_debug
+file_metil_library=${directory_metil_library}/metil_debug.o
 else
-	directory_metil_library=${directory_metil}/library
-	file_metil_library=${directory_metil_library}/metil.o
+directory_metil_library=${directory_metil}/library
+file_metil_library=${directory_metil_library}/metil.o
 endif
 
 directory_cer0_library=${directory_cer0}/library
@@ -157,9 +161,11 @@ cc=clang
 frameworks=Metal MetalKit GameController CoreAudio CoreGraphics CoreText
 
 target_device=mac
+
 ifndef target_macos_version
-	target_macos_version=26.0
+target_macos_version=26.0
 endif
+
 target_macos_version_metal=${target_macos_version}
 target_platform=arm64-apple-macos${target_macos_version}
 target_platform_metal=air64-apple-macos${target_macos_version_metal}
@@ -177,7 +183,7 @@ metal_flags_common=-target ${target_platform_metal}
 metal_flags=${metal_flags_common} -I${directory_include} -I${directory_clic3_include} -I${directory_metil_include} -isysroot ${directory_macos_sdk}
 
 ifneq (${disable_metal_fast_options}, 1)
-	metal_flags:=${metal_flags} -fmetal-math-mode\=fast -fmetal-math-fp32-functions\=fast
+metal_flags:=${metal_flags} -fmetal-math-mode\=fast -fmetal-math-fp32-functions\=fast
 endif
 
 metal_flags_output=
@@ -186,8 +192,8 @@ cc=gcc
 c_flags_output=
 endif
 
-c_flags_objective_c_debug=-O0 -g -v
-c_flags_debug=${c_flags_objective_c_debug} -da -Q
+c_flags_debug_objective_c=-O0 -g -v
+c_flags_debug=${c_flags_debug_objective_c} -da -Q
 
 c_flags_c:=${c_flags_c} ${c_flags_includes}
 
@@ -200,8 +206,8 @@ c_flags_objective_c:=${c_flags_objective_c} -Drendering_mode=3
 endif
 
 ifeq (${debug}, 1)
-	c_flags_c:=${c_flags_c} ${c_flags_debug}
-	c_flags_objective_c:=${c_flags_objective_c} ${c_flags_objective_c_debug}
+c_flags_c:=${c_flags_c} ${c_flags_debug}
+c_flags_objective_c:=${c_flags_objective_c} ${c_flags_debug_objective_c}
 
 ifeq (${rendering_mode},2d)
 c_flags_output:=${c_flags_output} ${c_flags_debug}
@@ -210,13 +216,10 @@ c_flags_output:=${c_flags_output} ${c_flags_debug_objective_c}
 endif
 
 else
-	c_flags_c:=${c_flags_c} -O3
-	c_flags_objective_c:=${c_flags_objective_c} -O3
+c_flags_c:=${c_flags_c} -O3
+c_flags_objective_c:=${c_flags_objective_c} -O3
 
-ifeq (${rendering_mode},3d)
 c_flags_output:=${c_flags_output} -O3
-endif
-
 endif
 
 strip=strip
