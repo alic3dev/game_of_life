@@ -45,9 +45,15 @@ jobs:
         run: cd interrupt_handler && make
       - name: make_game_of_life_2d
         run: cd game_of_life && make
+      - name: make_game_of_life_clean
+        run: cd game_of_life && make clean
       - name: make_game_of_life_2d_with_metal
         run: cd game_of_life && with_metal=1 make
+      - name: make_game_of_life_clean
+        run: cd game_of_life && make clean
       - name: make_game_of_life_3d
         run: cd game_of_life && rendering_mode=3d make
+      - name: make_game_of_life_clean
+        run: cd game_of_life && make clean
       - name: make_game_of_life_3d_with_metal
         run: cd game_of_life && rendering_mode=3d with_metal=1 make
