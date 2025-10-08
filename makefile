@@ -1,5 +1,15 @@
 name=game_of_life
 
+allow_all_variations=0
+
+ifndef debug
+ifndef rendering_mode
+ifndef with_metal
+allow_all_variations=1
+endif
+endif
+endif
+
 directory_objects_base=objects
 directory_output_base=output
 
@@ -19,6 +29,10 @@ ifndef debug
 debug=0
 endif
 
+ifndef with_metal
+with_metal=0
+endif
+
 name:=${name}_${rendering_mode}
 
 ifeq (${debug}, 1)
@@ -31,6 +45,13 @@ endif
 
 directory_objects:=${directory_objects}/${rendering_mode}
 directory_output:=${directory_output}/${rendering_mode}
+
+ifeq (${with_metal},1)
+name:=${name}_metal_accelerated
+
+directory_objects:=${directory_objects}_metal_accelerated
+directory_output:=${directory_output}_metal_accelerated
+endif
 
 directory_objects_c=${directory_objects}/c
 directory_objects_objective_c=${directory_objects}/objective_c
@@ -106,10 +127,6 @@ file_output_storyboard=${directory_app_contents_resources}/metil.storyboardc
 endif
 
 uses_metal=0
-
-ifndef with_metal
-with_metal=0
-endif
 
 ifeq (${with_metal},1)
 uses_metal=1
@@ -209,7 +226,7 @@ ifeq (${debug}, 1)
 c_flags_c:=${c_flags_c} ${c_flags_debug}
 c_flags_objective_c:=${c_flags_objective_c} ${c_flags_debug_objective_c}
 
-ifeq (${rendering_mode},2d)
+ifeq (${cc},gcc)
 c_flags_output:=${c_flags_output} ${c_flags_debug}
 else
 c_flags_output:=${c_flags_output} ${c_flags_debug_objective_c}
@@ -222,18 +239,44 @@ c_flags_objective_c:=${c_flags_objective_c} -O3
 c_flags_output:=${c_flags_output} -O3
 endif
 
+ifeq (${with_metal},1)
+c_flags_c:=${c_flags_c} -Dwith_metal=1
+c_flags_objective_c:=${c_flags_objective_c} -Dwith_metal=1
+endif
+
 strip=strip
 strip_flags=-x
 
 all: ${file_output}
 
+ifeq (${allow_all_variations},1)
+all_variations:
+	make debug=0 rendering_mode=2d with_metal=0
+	make debug=0 rendering_mode=2d with_metal=1
+	make debug=1 rendering_mode=2d with_metal=0
+	make debug=1 rendering_mode=2d with_metal=1
+	make debug=0 rendering_mode=3d with_metal=0
+	make debug=0 rendering_mode=3d with_metal=1
+	make debug=1 rendering_mode=3d with_metal=0
+	make debug=1 rendering_mode=3d with_metal=1
+endif
+
 name: ${file_output}
 
 ifeq (${rendering_mode},2d)
+ifeq (${uses_metal},1)
+file_output_metal=${directory_output}/default.metallib
+
+${file_output}: ${files_objects_c} ${files_objects_objective_c} ${file_output_metal}
+	mkdir -p ${dir ${file_output}}
+	${cc} ${c_flags_output} ${files_objects_c} ${files_objects_objective_c} ${files_libraries} -o ${file_output}
+	${strip} ${strip_flags} ${file_output}
+else
 ${file_output}: ${files_objects_c}
 	mkdir -p ${dir ${file_output}}
 	${cc} ${c_flags_output} ${files_objects_c} ${files_libraries} -o ${file_output}
 	${strip} ${strip_flags} ${file_output}
+endif
 else
 ${file_output}: ${files_objects_c} ${files_objects_objective_c} ${file_output_metal} ${file_output_info_plist} ${file_output_storyboard}
 	mkdir -p ${dir ${file_output}}
@@ -245,12 +288,12 @@ ${file_output_storyboard}: ${file_metil_storyboard}
 	cp -r ${file_metil_storyboard} ${file_output_storyboard}
 
 ${file_output_info_plist}: ${file_info_plist}
-	mkdir -p ${directory_app_contents}
+	mkdir -p ${dir ${file_output_info_plist}}
 	cp ${file_info_plist} ${file_output_info_plist}
 endif
 
 ${file_output_metal}: ${file_metalar}
-	mkdir -p ${directory_app_contents_resources}
+	mkdir -p ${dir ${file_output_metal}}
 	${metallib} ${metal_flags_output} ${file_metalar} ${directory_metil_library}/metil_fps_display.metalar -o ${file_output_metal}
 
 ${file_metalar}: ${files_air}
@@ -275,7 +318,13 @@ run: ${file_output}
 
 clean: clean_all
 
-clean_all: clean_objects clean_output
+clean_all: clean_air clean_metalar clean_objects clean_output
+
+clean_air:
+	-rm -rf ${directory_air}
+
+clean_metalar:
+	-rm -rf ${directory_metalar}
 
 clean_objects:
 	-rm -rf ${directory_objects_base}
