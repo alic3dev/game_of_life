@@ -1,11 +1,29 @@
 #include <game_of_life.h>
 
+#if rendering_mode == 3
+#include <game_of_life_3d_initialize.h>
+#endif
+#if rendering_mode == 2
+#if with_metal == 1
+#include <game_of_life_metal_acceleration.h>
+#include <game_of_life_metal_acceleration_data.h>
+#endif
+#endif
 #include <game_of_life_parameters.h>
 #include <game_of_life_poll.h>
 
-#if rendering_mode == 3
-#include <game_of_life_3d_initialize.h>
+#if rendering_mode == 2
+#include <cexil.h>
+#if with_metal == 1
+#include <clic3_bytes.h>
+#endif
+#include <interrupt_handler.h>
+#endif
 
+#include <stdlib.h>
+#include <time.h>
+
+#if rendering_mode == 3
 int main(
   int length_parameters,
   const char** parameters
@@ -24,6 +42,12 @@ int main(
     return 1;
   }
 
+  srand(
+    time(
+      (void*)0
+    )
+  );
+
   return game_of_life_3d_initialize(
     length_parameters,
     parameters,
@@ -32,19 +56,6 @@ int main(
 }
 
 #elif rendering_mode == 2
-#if with_metal == 1
-#include <game_of_life_metal_acceleration.h>
-#include <game_of_life_metal_acceleration_data.h>
-
-#include <clic3_bytes.h>
-#endif
-
-#include <cexil.h>
-#include <interrupt_handler.h>
-
-#include <stdlib.h>
-#include <time.h>
-
 int main(
   int length_parameters,
   const char** parameters
