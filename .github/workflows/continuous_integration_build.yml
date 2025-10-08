@@ -12,6 +12,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: game_of_life
+      - name: checkout_cer0
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/cer0
+          path: cer0
       - name: checkout_cexil
         uses: actions/checkout@v4
         with:
@@ -37,12 +42,18 @@ jobs:
         with:
           repository: alic3dev/metil
           path: metil
+      - name: make_cer0
+        run: cd cer0 && make
       - name: make_cexil
         run: cd cexil && make
       - name: make_clic3
         run: cd clic3 && make
       - name: make_interrupt_handler
         run: cd interrupt_handler && make
+      - name: make_math_c
+        run: cd math_c && make
+      - name: make_metil
+        run: cd metil && make
       - name: make_game_of_life_2d
         run: cd game_of_life && make
       - name: make_game_of_life_clean
