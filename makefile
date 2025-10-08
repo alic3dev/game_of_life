@@ -115,7 +115,7 @@ ifeq (${rendering_mode},3d)
 uses_metal=1
 endif
 
-ifdef uses_metal
+ifeq (${uses_metal},1)
 directory_macos_sdk=${shell xcrun --show-sdk-path}
 
 ifndef directory_cer0
