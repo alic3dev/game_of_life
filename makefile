@@ -36,11 +36,17 @@ directory_include=include
 directory_metalar=metalar
 directory_sources=sources
 
-directory_clic3:=${directory_clic3}
+ifndef directory_clic3
+directory_clic3=../clic3
+endif
+
 directory_clic3_include=${directory_clic3}/include
 directory_clic3_library=${directory_clic3}/library
 
-directory_interrupt_handler:=${directory_interrupt_handler}
+ifndef directory_interrupt_handler
+directory_interrupt_handler=../directory_interrupt_handler
+endif
+
 directory_interrupt_handler_include=${directory_interrupt_handler}/include
 directory_interrupt_handler_library=${directory_interrupt_handler}/library
 
@@ -67,7 +73,10 @@ c_flags_platform=-target ${target_platform} -isysroot ${directory_macos_sdk}
 ifeq (${rendering_mode},2d)
 file_output=${directory_output}/${name}
 
-directory_cexil:=${directory_cexil}
+ifndef directory_cexil
+directory_cexil=../cexil
+endif
+
 directory_cexil_include=${directory_cexil}/include
 directory_cexil_library=${directory_cexil}/library
 
