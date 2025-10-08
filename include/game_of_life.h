@@ -3,7 +3,7 @@
 
 int main(
   int,
-  char**
+  const char**
 );
 
 #endif
