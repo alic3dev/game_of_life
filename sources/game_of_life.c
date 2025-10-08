@@ -98,6 +98,41 @@ int main(
     game_of_life_parameters.rate_frames
   );
 
+  #if with_metal == 1
+  struct game_of_life_metal_acceleration_data game_of_life_metal_acceleration_data = {
+    .metal_device = (void*)0,
+    .library = (void*)0,
+    .function_compute = (void*)0,
+    .pipeline_state_compute = (void*)0,
+    .error = game_of_life_metal_acceleration_data_error_none
+  };
+
+  game_of_life_metal_acceleration_initialize(
+    &game_of_life_metal_acceleration_data,
+    &game_of_life_parameters
+  );
+
+  if (
+    game_of_life_metal_acceleration_data.error != game_of_life_metal_acceleration_data_error_none
+  ) {
+    game_of_life_metal_acceleration_data_error_print(
+      game_of_life_metal_acceleration_data.error
+    );
+
+    return game_of_life_metal_acceleration_data.error;
+
+    game_of_life_destroy(
+      &renderer,
+      &game_of_life_parameters,
+      &game_of_life_metal_acceleration_data
+    );
+  }
+
+  unsigned long int length_cells = (
+    game_of_life_parameters.size.x *
+    game_of_life_parameters.size.y
+  );
+  #else
   for (
     unsigned int index_y = 0;
     index_y < game_of_life_parameters.size.y;
@@ -135,54 +170,10 @@ int main(
       game_of_life_parameters.size.x
     );
   }
-
-  #if with_metal == 1
-  struct game_of_life_metal_acceleration_data game_of_life_metal_acceleration_data = {
-    .metal_device = (void*)0,
-    .library = (void*)0,
-    .function_compute = (void*)0,
-    .pipeline_state_compute = (void*)0,
-    .error = game_of_life_metal_acceleration_data_error_none
-  };
-
-  game_of_life_metal_acceleration_initialize(
-    &game_of_life_metal_acceleration_data,
-    &game_of_life_parameters
-  );
-
-  if (
-    game_of_life_metal_acceleration_data.error != game_of_life_metal_acceleration_data_error_none
-  ) {
-    game_of_life_metal_acceleration_data_error_print(
-      game_of_life_metal_acceleration_data.error
-    );
-
-    return game_of_life_metal_acceleration_data.error;
-
-    game_of_life_destroy(
-      &renderer,
-      &game_of_life_parameters,
-      &game_of_life_metal_acceleration_data
-    );
-  }
-
-  unsigned long int length_cells = (
-    game_of_life_parameters.size.x *
-    game_of_life_parameters.size.y
-  );
   #endif
 
   while (interrupt_handler_interrupted == 0) {
-    cexil_renderer_render(
-      &renderer
-    );
-
     #if with_metal == 1
-    char* cells = game_of_life_metal_acceleration_compute(
-      &game_of_life_metal_acceleration_data,
-      &game_of_life_parameters
-    );
-
     for (
       unsigned long int index_cell = 0;
       index_cell < length_cells;
@@ -193,12 +184,23 @@ int main(
     ) {
       clic3_bytes_copy(
         renderer.pixels[index_cell / game_of_life_parameters.size.x],
-        cells + index_cell, (
+        game_of_life_metal_acceleration_data.cells + index_cell, (
           sizeof(unsigned char) *
           game_of_life_parameters.size.x
         )
       );
     }
+    #endif
+
+    cexil_renderer_render(
+      &renderer
+    );
+
+    #if with_metal == 1
+    game_of_life_metal_acceleration_compute(
+      &game_of_life_metal_acceleration_data,
+      &game_of_life_parameters
+    );
     #else
     game_of_life_poll(
       &game_of_life_parameters,

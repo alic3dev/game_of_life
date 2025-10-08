@@ -133,6 +133,12 @@ void game_of_life_metal_acceleration_initialize(
     options: MTLResourceStorageModeShared
   ];
 
+  game_of_life_metal_acceleration_data->buffer_living_neighbors = [
+    (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
+    newBufferWithLength: length_buffer
+    options: MTLResourceStorageModeShared
+  ];
+
   unsigned long int size[3] = {
     game_of_life_parameters->size.x,
     game_of_life_parameters->size.y,
@@ -148,7 +154,8 @@ void game_of_life_metal_acceleration_initialize(
 
   if (
     game_of_life_metal_acceleration_data->buffer_cells == (void*)0 ||
-    game_of_life_metal_acceleration_data->buffer_cells_next == (void*)0
+    game_of_life_metal_acceleration_data->buffer_cells_next == (void*)0 ||
+    game_of_life_metal_acceleration_data->buffer_living_neighbors == (void*)0
   ) {
     game_of_life_metal_acceleration_data->error = (
       game_of_life_metal_acceleration_data_error_create_buffer
@@ -170,9 +177,56 @@ void game_of_life_metal_acceleration_initialize(
       index_cell
     ] = rand() % 2;
   }
+
+  char* living_neighbors = (
+    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
+  ).contents;
+
+  for (
+    unsigned int index_cell = 0;
+    index_cell < length_buffer;
+    ++index_cell
+  ) {
+    unsigned long int index_x = index_cell % size[0];
+    unsigned long int index_y = index_cell / size[0];
+
+    for (
+      unsigned int index_neighbour_y = index_y == 0 ? 1 : index_y - 1;
+      index_neighbour_y < index_y + 2;
+      ++index_neighbour_y
+    ) {
+      for (
+        unsigned int index_neighbour_x = index_x == 0 ? 1 : index_x - 1;
+        index_neighbour_x < index_x + 2;
+        ++index_neighbour_x
+      ) {
+        if (
+          (index_neighbour_y == index_y && index_neighbour_x == index_x) ||
+          index_neighbour_y >= size[1] ||
+          index_neighbour_x >= size[0]
+        ) {
+          continue;
+        }
+
+        unsigned long int index_neighbour = (
+          index_neighbour_y * size[0] +
+          index_neighbour_x
+        );
+
+        if (cells[index_neighbour] != 0) {
+          living_neighbors[index_cell] = (
+            living_neighbors[index_cell] + 1
+          );
+        }
+      }
+    }
+  }
+
+  game_of_life_metal_acceleration_data->cells = cells;
+  game_of_life_metal_acceleration_data->living_neighbors = living_neighbors;
 }
 
-char* game_of_life_metal_acceleration_compute(
+void game_of_life_metal_acceleration_compute(
   struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data,
   struct game_of_life_parameters* game_of_life_parameters
 ) {
@@ -206,9 +260,15 @@ char* game_of_life_metal_acceleration_compute(
   ];
 
   [encoder_command_compute
-    setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_size
+    setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
     offset: 0
     atIndex: 2
+  ];
+
+  [encoder_command_compute
+    setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_size
+    offset: 0
+    atIndex: 3
   ];
 
   unsigned long int length_buffer = (
@@ -268,7 +328,12 @@ char* game_of_life_metal_acceleration_compute(
     ];
   }
 
-  return cells;
+  char* living_neighbors = (
+    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
+  ).contents;
+
+  game_of_life_metal_acceleration_data->cells = cells;
+  game_of_life_metal_acceleration_data->living_neighbors = living_neighbors;
 }
 
 void game_of_life_metal_acceleration_destroy(
@@ -285,6 +350,12 @@ void game_of_life_metal_acceleration_destroy(
     game_of_life_metal_acceleration_data->buffer_cells_next != (void*)0
   ) {
     [(id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells_next release];
+  }
+
+  if (
+    game_of_life_metal_acceleration_data->buffer_living_neighbors != (void*)0
+  ) {
+    [(id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors release];
   }
 
   if (

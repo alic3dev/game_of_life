@@ -1,6 +1,9 @@
 #ifndef __game_of_life_3d_scene_h
 #define __game_of_life_3d_scene_h
 
+#if with_metal == 1
+#include <game_of_life_metal_acceleration_data.h>
+#endif
 #include <game_of_life_parameters.h>
 
 #include <metil_scenes/scene.h>
@@ -9,10 +12,16 @@
 #include <Metal/MTLDevice.h>
 
 struct game_of_life_3d_scene_data {
+  unsigned long int frame;
+  #if with_metal == 1
+  struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data;
+  #else
   char** cells;
   char** cells_next;
-
+  #endif
+  unsigned int length_cells;
   struct game_of_life_parameters* game_of_life_parameters;
+  unsigned int index_audio;
 };
 
 void game_of_life_3d_scene_initialize(

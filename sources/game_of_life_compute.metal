@@ -1,6 +1,7 @@
 kernel void game_of_life_compute(
   device const char* cells,
   device char* cells_next,
+  device char* cells_living_neighbors,
   constant unsigned long int size[3],
   uint index [[thread_position_in_grid]]
 ) {
@@ -32,9 +33,11 @@ kernel void game_of_life_compute(
         index_neighbour_x
       );
 
-      living_neighbors = (
-        living_neighbors + cells[index_neighbour]
-      );
+      if (cells[index_neighbour] != 0) {
+        living_neighbors = (
+          living_neighbors + 1
+        );
+      }
     }
   }
 
@@ -46,4 +49,6 @@ kernel void game_of_life_compute(
   } else {
     cells_next[index] = 0;
   }
+
+  cells_living_neighbors[index] = living_neighbors;
 }

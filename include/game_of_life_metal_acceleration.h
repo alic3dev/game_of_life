@@ -9,7 +9,7 @@ void game_of_life_metal_acceleration_initialize(
   struct game_of_life_parameters*
 );
 
-char* game_of_life_metal_acceleration_compute(
+void game_of_life_metal_acceleration_compute(
   struct game_of_life_metal_acceleration_data*,
   struct game_of_life_parameters*
 );
