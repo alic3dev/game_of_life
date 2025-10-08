@@ -22,18 +22,50 @@ make run
 
 ## development
 
-### requirements
+### requirements:2d
 
-- [alic3](https://github.com/alic3dev)
+- [`alic3`](https://github.com/alic3dev)
 - - [`cexil`](https://github.com/alic3dev/cexil)
 - - [`clic3`](https://github.com/alic3dev/clic3)
 - - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
 
-#### environment_variables
+### requirements:3d
+
+- os->{`macos`}
+- - version.minimum->{`15.0`};
+- - - defaults:to->{`26.0`};
+- - - override_with:`target_macos_version`
+- - with->{`metal`}.support();
+
+- [`alic3`](https://github.com/alic3dev):libraries
+- - [`cer0`](https://github.com/alic3dev/cer0)
+- - [`clic3`](https://github.com/alic3dev/clic3)
+- - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
+- - [`math_c`](https://github.com/alic3dev/math_c)
+- - [`metil`](https://github.com/alic3dev/metil)
+
+#### frameworks
+
+- `metal`
+- `metalkit`
+- `gamecontroller`
+- `coreaudio`
+- `coregraphics`
+- `coretext`
+
+#### environment_variables:2d
 
 - `directory_cexil`
 - `directory_clic3`
 - `directory_interrupt_handler`
+
+#### environment_variables:3d
+
+- `directory_cer0`
+- `directory_clic3`
+- `directory_interrupt_handler`
+- `directory_math_c`
+- `directory_metil`
 
 ### building
 
@@ -43,12 +75,13 @@ make
 
 #### compilation_options
 
-- `with_metal`: default->{`0`}; (WIP)
-- - `0`: disables metal acceleration for computation
-- - `1`: enables metal acceleration for computation
+- `debug=1`:adds->{`debugging_symbols`}:disables->{`optimizations`};
 - `rendering_mode`: default->{`2d`};
 - - `2d`: renders in `2d` using [`cexil`](https://github.com/alic3dev/cexil)
 - - `3d`: renders in `3d` using [`metil`](https://github.com/alic3dev/metil)
+- `with_metal`: default->{`0`}; (WIP)
+- - `0`: disables metal acceleration for computation
+- - `1`: enables metal acceleration for computation
 
 ##### example
 
