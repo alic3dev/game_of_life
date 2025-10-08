@@ -44,7 +44,7 @@ directory_clic3_include=${directory_clic3}/include
 directory_clic3_library=${directory_clic3}/library
 
 ifndef directory_interrupt_handler
-directory_interrupt_handler=../directory_interrupt_handler
+directory_interrupt_handler=../interrupt_handler
 endif
 
 directory_interrupt_handler_include=${directory_interrupt_handler}/include
