@@ -1,20 +1,14 @@
+name=game_of_life
+
+allow_all_variations=0
+
 ifndef debug
 ifndef rendering_mode
 ifndef with_metal
-all_variations:
-	make debug=0 rendering_mode=2d with_metal=0
-	make debug=0 rendering_mode=2d with_metal=1
-	make debug=1 rendering_mode=2d with_metal=0
-	make debug=1 rendering_mode=2d with_metal=1
-	make debug=0 rendering_mode=3d with_metal=0
-	make debug=0 rendering_mode=3d with_metal=1
-	make debug=1 rendering_mode=3d with_metal=0
-	make debug=1 rendering_mode=3d with_metal=1
+allow_all_variations=1
 endif
 endif
 endif
-
-name=game_of_life
 
 directory_objects_base=objects
 directory_output_base=output
@@ -254,6 +248,18 @@ strip=strip
 strip_flags=-x
 
 all: ${file_output}
+
+ifeq (${allow_all_variations},1)
+all_variations:
+	make debug=0 rendering_mode=2d with_metal=0
+	make debug=0 rendering_mode=2d with_metal=1
+	make debug=1 rendering_mode=2d with_metal=0
+	make debug=1 rendering_mode=2d with_metal=1
+	make debug=0 rendering_mode=3d with_metal=0
+	make debug=0 rendering_mode=3d with_metal=1
+	make debug=1 rendering_mode=3d with_metal=0
+	make debug=1 rendering_mode=3d with_metal=1
+endif
 
 name: ${file_output}
 

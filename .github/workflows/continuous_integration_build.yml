@@ -57,16 +57,16 @@ jobs:
       - name: make_metil
         run: cd metil && make
       - name: make_game_of_life_2d
-        run: cd game_of_life && make
+        run: cd game_of_life && make debug=0 rendering_mode=2d with_metal=0
       - name: make_game_of_life_clean
         run: cd game_of_life && make clean
       - name: make_game_of_life_2d_with_metal
-        run: cd game_of_life && with_metal=1 make
+        run: cd game_of_life && make debug=0 rendering_mode=2d with_metal=1
       - name: make_game_of_life_clean
         run: cd game_of_life && make clean
       - name: make_game_of_life_3d
-        run: cd game_of_life && rendering_mode=3d make
+        run: cd game_of_life && make debug=0 rendering_mode=3d with_metal=0
       - name: make_game_of_life_clean
         run: cd game_of_life && make clean
       - name: make_game_of_life_3d_with_metal
-        run: cd game_of_life && rendering_mode=3d with_metal=1 make
+        run: cd game_of_life && make debug=0 rendering_mode=3d with_metal=1
