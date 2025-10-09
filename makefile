@@ -56,7 +56,15 @@ endif
 directory_objects_c=${directory_objects}/c
 directory_objects_objective_c=${directory_objects}/objective_c
 
-directory_air=air
+directory_air_base=air
+directory_air=${directory_air_base}/${rendering_mode}
+
+ifeq (${debug},1)
+directory_air:=${directory_air}/debug
+else
+directory_air:=${directory_air}/release
+endif
+
 directory_include=include
 directory_metalar=metalar
 directory_sources=sources
@@ -83,13 +91,35 @@ file_output_metal=${directory_output}/default.metallib
 
 files_libraries=${file_clic3_library} ${file_interrupt_handler_library}
 
+ifeq (${rendering_mode},2d)
+files_metal=${wildcard ${directory_sources}/*_compute.metal}
+else
 files_metal=${wildcard ${directory_sources}/*.metal}
+
+ifeq (${with_metal},0)
+files_metal:=${filter-out ${directory_sources}/%_compute.metal,${files_metal}}
+endif
+endif
+
 files_air=${patsubst ${directory_sources}/%.metal,${directory_air}/%.air,${files_metal}}
 
 files_sources_c=${wildcard ${directory_sources}/*.c}
-files_objects_c=${patsubst ${directory_sources}/%.c,${directory_objects_c}/%.o,${files_sources_c}}
-
 files_sources_objective_c=${wildcard ${directory_sources}/*.m}
+
+ifeq (${rendering_mode},2d)
+files_sources_objective_c:=${filter-out ${directory_sources}/game_of_life_3d%.m,${files_sources_objective_c}}
+else
+files_sources_c:=${filter-out ${directory_sources}/game_of_life_poll.c,${files_sources_c}}
+endif
+
+ifeq (${with_metal},1)
+files_sources_c:=${filter-out ${directory_sources}/game_of_life_poll.c,${files_sources_c}}
+else
+files_sources_c:=${filter-out ${directory_sources}/game_of_life_metal_acceleration%,${files_sources_c}}
+files_sources_objective_c:=${filter-out ${directory_sources}/game_of_life_metal_acceleration%,${files_sources_objective_c}}
+endif
+
+files_objects_c=${patsubst ${directory_sources}/%.c,${directory_objects_c}/%.o,${files_sources_c}}
 files_objects_objective_c=${patsubst ${directory_sources}/%.m,${directory_objects_objective_c}/%.o,${files_sources_objective_c}}
 
 c_flags_includes=-I${directory_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include}
@@ -124,6 +154,8 @@ file_output=${directory_app_contents_macos}/${name}
 file_output_info_plist=${directory_app_contents}/Info.plist
 file_output_metal=${directory_app_contents_resources}/default.metallib
 file_output_storyboard=${directory_app_contents_resources}/metil.storyboardc
+
+file_metil_metalar_fps_display=${directory_metil_library}/metil_fps_display.metalar
 endif
 
 uses_metal=0
@@ -297,14 +329,25 @@ ${file_output_info_plist}: ${file_info_plist}
 	cp ${file_info_plist} ${file_output_info_plist}
 endif
 
+ifeq (${rendering_mode},2d)
 ${file_output_metal}: ${file_metalar}
 	mkdir -p ${dir ${file_output_metal}}
-	${metallib} ${metal_flags_output} ${file_metalar} ${directory_metil_library}/metil_fps_display.metalar -o ${file_output_metal}
+	${metallib} ${metal_flags_output} ${file_metalar} -o ${file_output_metal}
+
+${file_metalar}: ${directory_air}/game_of_life_compute.air
+	mkdir -p ${directory_metalar}
+	if [[ -f ${file_metalar} ]]; then rm ${file_metalar}; fi
+	${metal_ar} -rc ${file_metalar} ${directory_air}/game_of_life_compute.air
+else
+${file_output_metal}: ${file_metalar}
+	mkdir -p ${dir ${file_output_metal}}
+	${metallib} ${metal_flags_output} ${file_metalar} ${file_metil_metalar_fps_display} -o ${file_output_metal}
 
 ${file_metalar}: ${files_air}
 	mkdir -p ${directory_metalar}
 	if [[ -f ${file_metalar} ]]; then rm ${file_metalar}; fi
 	${metal_ar} -rc ${file_metalar} ${files_air}
+endif
 
 ${directory_air}/%.air: ${directory_sources}/%.metal
 	mkdir -p ${directory_air}
@@ -326,7 +369,7 @@ clean: clean_all
 clean_all: clean_air clean_metalar clean_objects clean_output
 
 clean_air:
-	-rm -rf ${directory_air}
+	-rm -rf ${directory_air_base}
 
 clean_metalar:
 	-rm -rf ${directory_metalar}
