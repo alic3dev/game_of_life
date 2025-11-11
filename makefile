@@ -83,13 +83,21 @@ endif
 directory_interrupt_handler_include=${directory_interrupt_handler}/include
 directory_interrupt_handler_library=${directory_interrupt_handler}/library
 
+ifndef directory_rand
+directory_rand=../rand
+endif
+
+directory_rand_include=${directory_rand}/include
+directory_rand_library=${directory_rand}/library
+
 file_clic3_library=${directory_clic3_library}/clic3.o
 file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.o
+file_rand_library=${directory_rand_library}/rand.o
 
 file_metalar=${directory_metalar}/${name}.metalar
 file_output_metal=${directory_output}/default.metallib
 
-files_libraries=${file_clic3_library} ${file_interrupt_handler_library}
+files_libraries=${file_clic3_library} ${file_interrupt_handler_library} ${file_rand_library}
 
 ifeq (${rendering_mode},2d)
 files_metal=${wildcard ${directory_sources}/*_compute.metal}
@@ -122,7 +130,7 @@ endif
 files_objects_c=${patsubst ${directory_sources}/%.c,${directory_objects_c}/%.o,${files_sources_c}}
 files_objects_objective_c=${patsubst ${directory_sources}/%.m,${directory_objects_objective_c}/%.o,${files_sources_objective_c}}
 
-c_flags_includes=-I${directory_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include}
+c_flags_includes=-I${directory_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include} -I${directory_rand_include}
 c_flags_platform=-target ${target_platform} -isysroot ${directory_macos_sdk}
 
 ifeq (${rendering_mode},2d)

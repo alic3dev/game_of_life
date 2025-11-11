@@ -2,8 +2,11 @@
 
 #include <game_of_life_metal_acceleration_data.h>
 #include <game_of_life_parameters.h>
+#include <game_of_life_cell_transform.h>
 
 #include <clic3_vector.h>
+
+#include <rand_result.h>
 
 #include <Metal/MTLBuffer.h>
 #include <Metal/MTLCommandBuffer.h>
@@ -14,7 +17,8 @@
 
 void game_of_life_metal_acceleration_initialize(
   struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data,
-  struct game_of_life_parameters* game_of_life_parameters
+  struct game_of_life_parameters* game_of_life_parameters,
+  struct rand_result* rand_result
 ) {
   game_of_life_metal_acceleration_data->error = (
     game_of_life_metal_acceleration_data_error_none
@@ -116,26 +120,21 @@ void game_of_life_metal_acceleration_initialize(
     }
   }
 
-  unsigned int length_buffer = (
-    game_of_life_parameters->size.x *
-    game_of_life_parameters->size.y
-  );
-
   game_of_life_metal_acceleration_data->buffer_cells = [
     (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
-    newBufferWithLength: length_buffer
+    newBufferWithLength: rand_result->length
     options: MTLResourceStorageModeShared
   ];
 
   game_of_life_metal_acceleration_data->buffer_cells_next = [
     (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
-    newBufferWithLength: length_buffer
+    newBufferWithLength: rand_result->length
     options: MTLResourceStorageModeShared
   ];
 
   game_of_life_metal_acceleration_data->buffer_living_neighbors = [
     (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
-    newBufferWithLength: length_buffer
+    newBufferWithLength: rand_result->length
     options: MTLResourceStorageModeShared
   ];
 
@@ -170,12 +169,16 @@ void game_of_life_metal_acceleration_initialize(
 
   for (
     unsigned int index_cell = 0;
-    index_cell < length_buffer;
+    index_cell < rand_result->length;
     ++index_cell
   ) {
     cells[
       index_cell
-    ] = rand() % 2;
+    ] = game_of_life_cell_transform(
+      rand_result->bytes[
+        index_cell
+      ]
+    );
   }
 
   char* living_neighbors = (
@@ -184,7 +187,7 @@ void game_of_life_metal_acceleration_initialize(
 
   for (
     unsigned int index_cell = 0;
-    index_cell < length_buffer;
+    index_cell < rand_result->length;
     ++index_cell
   ) {
     unsigned long int index_x = index_cell % size[0];
