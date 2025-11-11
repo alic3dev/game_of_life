@@ -4,25 +4,18 @@ implementation.of->{`game_of_life`}.utilizing->{[`cexil`](https://github.com/ali
 
 ### 2d
 
-<img width="1377" alt="game_of_life:2d" src="https://github.com/user-attachments/assets/29e4873d-3a05-4bb6-8392-3f92534531cb" />
+<img width="1920" height="1204" alt="Screenshot 2025-11-10 at 23 21 52" src="https://github.com/user-attachments/assets/14491023-88b1-45ef-b0a4-110148c871df" />
+<img width="1920" height="1204" alt="Screenshot 2025-11-10 at 23 17 37" src="https://github.com/user-attachments/assets/d97db256-0783-4198-86bc-5afb61103c86" />
 
 ### 3d
 
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 36 44" src="https://github.com/user-attachments/assets/d0b991e4-ce04-4b24-8fc0-d3eba055fdf2" />
-
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 37 56" src="https://github.com/user-attachments/assets/9564b18d-c014-4e2a-91e6-2dea4814df3e" />
-
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 36 32" src="https://github.com/user-attachments/assets/4dff77ac-ab8a-4ed2-9e31-87516328b82b" />
-  
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 49" src="https://github.com/user-attachments/assets/d68be008-b50a-4434-9d23-cc4e3f151530" />
-  
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 36 13" src="https://github.com/user-attachments/assets/1f40fa41-0d40-4726-a84f-0207ceb93f74" />
-
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 05" src="https://github.com/user-attachments/assets/ac1f2762-9775-41d6-a2cc-83321e6f8019" />
-
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 30" src="https://github.com/user-attachments/assets/03a498f5-f791-4731-9fa5-956c91d3bbb9" />
-
-<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 38" src="https://github.com/user-attachments/assets/abd6a5fa-d8bf-4fa2-b214-a6c0e4d68b64" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 23 18 36" src="https://github.com/user-attachments/assets/974e183d-8c00-41ad-ba82-31ec9f436153" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 23 18 57" src="https://github.com/user-attachments/assets/196c8b9f-c316-42a2-8d84-53fb4cf7062c" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 23 19 07" src="https://github.com/user-attachments/assets/e59e0154-0fd4-4a09-9d3f-bbabad19b27a" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 23 19 17" src="https://github.com/user-attachments/assets/ac6ee319-f2f3-44ef-9d86-f2fb097913e2" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 23 19 32" src="https://github.com/user-attachments/assets/fa987f54-ccc5-4e7a-850f-c18e7c5c79b1" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 23 19 42" src="https://github.com/user-attachments/assets/6660df4d-5d58-4218-96b6-71529c6e205f" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 23 19 57" src="https://github.com/user-attachments/assets/a191b32a-a6fc-4b46-b581-b8447ecc1074" />
 
 ## running
 
