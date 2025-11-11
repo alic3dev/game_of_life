@@ -51,17 +51,19 @@ unsigned char game_of_life_parameters_parse(
     int index_parameter_supplied = clic3_char_arrays_within(
       (char*) parameters[index_parameter],
       #if rendering_mode == 3
-      5,
+      4,
       #else
       4,
       #endif
       "--size-x",
       "--size-y",
-      "--frame-rate",
       "--rate-poll"
-      #if rendering_mode == 3
+      #if rendering_mode == 2
       ,
-      "--audio"
+      "--frame-rate"
+      #elif rendering_mode == 3
+      ,
+      "--audio",
       #endif
     );
 
@@ -150,41 +152,6 @@ unsigned char game_of_life_parameters_parse(
       }
       case 2: {
         if (
-          has_set_frame_rate == 1
-        ) {
-          fprintf(
-            stderr,
-            message_parameter_already_set,
-            parameters[index_parameter]
-          );
-
-          return 1;
-        }
-        
-        index_parameter = (
-          index_parameter + 1
-        );
- 
-        unsigned char status_float_conversion = clic3_char_array_to_float(
-          (char*) parameters[index_parameter],
-          &game_of_life_parameters->rate_frames
-        );
-
-        if (
-          status_float_conversion != 0
-        ) {
-          fprintf(
-            stderr,
-            "invalid_frame_rate->{%s}\n",
-            parameters[index_parameter]
-          );
-
-          return 1;
-        }
-        break;
-      }
-      case 3: {
-        if (
           has_set_rate_poll == 1
         ) {
           fprintf(
@@ -218,8 +185,44 @@ unsigned char game_of_life_parameters_parse(
         }
         break;
       }
-      #if rendering_mode == 3
-      case 4:
+      #if rendering_mode == 2
+      case 3: {
+        if (
+          has_set_frame_rate == 1
+        ) {
+          fprintf(
+            stderr,
+            message_parameter_already_set,
+            parameters[index_parameter]
+          );
+
+          return 1;
+        }
+        
+        index_parameter = (
+          index_parameter + 1
+        );
+ 
+        unsigned char status_float_conversion = clic3_char_array_to_float(
+          (char*) parameters[index_parameter],
+          &game_of_life_parameters->rate_frames
+        );
+
+        if (
+          status_float_conversion != 0
+        ) {
+          fprintf(
+            stderr,
+            "invalid_frame_rate->{%s}\n",
+            parameters[index_parameter]
+          );
+
+          return 1;
+        }
+        break;
+      }
+      #elif rendering_mode == 3
+      case 3: {
         if (
           game_of_life_parameters->audio == 1
         ) {
@@ -234,6 +237,7 @@ unsigned char game_of_life_parameters_parse(
 
         game_of_life_parameters->audio = 1;
         break;
+      }
       #endif
       default: 
         fprintf(

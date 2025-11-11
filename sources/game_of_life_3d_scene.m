@@ -13,8 +13,12 @@
 #include <metil_library.h>
 #include <metil_mesh/mesh_box.h>
 #include <metil_object.h>
+#include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_scenes/scene.h>
-#include <metil_shader_types.h>
+
+#if with_metal == 1
+#import <AppKit/NSApplication.h>
+#endif
 
 #include <stdlib.h>
 
@@ -56,7 +60,7 @@ void game_of_life_3d_scene_initialize(
     sizeof(struct game_of_life_metal_acceleration_data)
   );
   
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->metal_device = scene->metal_kit_device;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->metal_device = scene->metal_device;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->library = metil_library.library;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->function_compute = (void*)0;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->pipeline_state_compute = (void*)0;
@@ -159,28 +163,62 @@ void game_of_life_3d_scene_initialize(
       );
 
       scene->objects[index_object]->vertices = [metal_kit_device
-        newBufferWithBytes: scene->objects[index_object]->mesh.vertices
-        length: scene->objects[index_object]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
+        newBufferWithBytes: (
+          scene->objects[
+            index_object
+          ]->mesh.vertices
+        )
+        length: (
+          sizeof(struct clic3_vector4_float) *
+          scene->objects[
+            index_object
+          ]->mesh.length_vertices
+        )
         options: MTLResourceStorageModeShared
       ];
 
       scene->objects[index_object]->indices = [metal_kit_device
-        newBufferWithBytes: scene->objects[index_object]->mesh.indices
-        length: scene->objects[index_object]->mesh.length_indices * sizeof(unsigned int)
+        newBufferWithBytes: (
+          scene->objects[
+            index_object
+          ]->mesh.indices
+        )
+        length: (
+          sizeof(unsigned int) *
+          scene->objects[
+            index_object
+          ]->mesh.length_indices
+        )
         options: MTLResourceStorageModeShared
       ];
     } else {
-      scene->objects[index_object]->mesh = scene->objects[0]->mesh;
-      scene->objects[index_object]->vertices = scene->objects[0]->vertices;
-      scene->objects[index_object]->indices = scene->objects[0]->indices;
+      scene->objects[
+        index_object
+      ]->mesh = (
+        scene->objects[0]->mesh
+      );
+
+      scene->objects[
+        index_object
+      ]->vertices = (
+        scene->objects[0]->vertices
+      );
+
+      scene->objects[
+        index_object
+      ]->indices = (
+        scene->objects[0]->indices
+      );
     }
 
     scene->objects[index_object]->data = [metal_kit_device
-      newBufferWithLength: sizeof(metil_kit_data_frame_object)
+      newBufferWithLength: (
+        sizeof(struct metil_renderer_data_object)
+      )
       options: MTLResourceStorageModeShared
     ];
 
-    metil_kit_data_frame_object* data = scene->objects[
+    struct metil_renderer_data_object* data = scene->objects[
       index_object
     ]->data.contents;
     data->id = index_object;
@@ -283,7 +321,7 @@ void game_of_life_3d_scene_poll(
     index_object < scene->length_objects;
     ++index_object
   ) {
-    metil_kit_data_frame_object* data = scene->objects[
+    struct metil_renderer_data_object* data = scene->objects[
       index_object
     ]->data.contents;
 
@@ -353,7 +391,7 @@ void game_of_life_3d_scene_poll(
         }
       }
 
-      metil_kit_data_frame_object* data = scene->objects[
+      struct metil_renderer_data_object* data = scene->objects[
         index_object
       ]->data.contents;
 
