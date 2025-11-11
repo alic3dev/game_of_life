@@ -15,6 +15,8 @@ unsigned char game_of_life_parameters_parse(
   int length_parameters,
   const char** parameters
 ) {
+  game_of_life_parameters->help = 0;
+
   #if rendering_mode == 2
   struct cexil_size size_renderer;
   
