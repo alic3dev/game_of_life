@@ -6,11 +6,15 @@
 struct game_of_life_parameters {
   struct clic3_vector2_unsigned_int size;
   struct clic3_vector2_unsigned_int offset;
-  float rate_frames;
-  unsigned int rate_poll;
 
-  #if rendering_mode == 3
+  unsigned char help;
+
+  #if rendering_mode == 2
+  float rate_frames;
+  #elif rendering_mode == 3
   unsigned char audio;
+  unsigned char fps_display;
+  unsigned int rate_poll;
   #endif
 };
 
