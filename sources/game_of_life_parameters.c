@@ -59,7 +59,7 @@ unsigned char game_of_life_parameters_parse(
     int index_parameter_supplied = clic3_char_arrays_within(
       (char*) parameters[index_parameter],
       #if rendering_mode == 2
-      5,
+      4,
       #elif rendering_mode == 3
       6,
       #endif
