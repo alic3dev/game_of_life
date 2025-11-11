@@ -44,12 +44,12 @@ jobs:
         with:
           repository: alic3dev/metil
           path: metil
+      - name: make_clic3
+        run: cd clic3 && make
       - name: make_cer0
         run: cd cer0 && make
       - name: make_cexil
         run: cd cexil && make
-      - name: make_clic3
-        run: cd clic3 && make
       - name: make_interrupt_handler
         run: cd interrupt_handler && make
       - name: make_math_c
