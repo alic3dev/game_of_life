@@ -4,9 +4,12 @@
 #include <game_of_life_metal_acceleration_data.h>
 #include <game_of_life_parameters.h>
 
+#include <rand_result.h>
+
 void game_of_life_metal_acceleration_initialize(
   struct game_of_life_metal_acceleration_data*,
-  struct game_of_life_parameters*
+  struct game_of_life_parameters*,
+  struct rand_result*
 );
 
 void game_of_life_metal_acceleration_compute(

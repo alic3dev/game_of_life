@@ -7,6 +7,8 @@
 #if with_metal == 1
 #include <game_of_life_metal_acceleration.h>
 #include <game_of_life_metal_acceleration_data.h>
+#else
+#include <game_of_life_cell_transform.h>
 #endif
 #endif
 
@@ -16,14 +18,24 @@
 
 #if rendering_mode == 2
 #include <cexil.h>
+
 #if with_metal == 1
 #include <clic3_bytes.h>
 #endif
+
 #include <interrupt_handler.h>
+
+#include <rand_clean.h>
+#include <rand_functions.h>
+#include <rand_initialize.h>
+#include <rand_mode.h>
+#include <rand_parameters.h>
+#include <rand_result.h>
+#include <rand_source.h>
+#include <rand_source_type.h>
 #endif
 
 #include <stdlib.h>
-#include <time.h>
 
 #if rendering_mode == 3
 int main(
@@ -59,12 +71,6 @@ int main(
 
     return 0;
   }
-
-  srand(
-    time(
-      (void*)0
-    )
-  );
 
   return game_of_life_3d_initialize(
     length_parameters,
@@ -110,12 +116,6 @@ int main(
 
   interrupt_handler_initialize();
 
-  srand(
-    time(
-      (void*)0
-    )
-  );
-
   struct cexil_renderer renderer;
   struct cexil_size size_renderer = {
     .width = game_of_life_parameters.size.x,
@@ -132,6 +132,27 @@ int main(
     game_of_life_parameters.rate_frames
   );
 
+  struct rand_parameters rand_parameters;
+  struct rand_result rand_result;
+  struct rand_source rand_source;
+
+  rand_initialize(
+    &rand_parameters,
+    &rand_result,
+    &rand_source, (
+      game_of_life_parameters.size.y *
+      game_of_life_parameters.size.x
+    ),
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
+  rand_get(
+    &rand_source,
+    &rand_result,
+    &rand_parameters
+  );
+
   #if with_metal == 1
   struct game_of_life_metal_acceleration_data game_of_life_metal_acceleration_data = {
     .metal_device = (void*)0,
@@ -143,7 +164,8 @@ int main(
 
   game_of_life_metal_acceleration_initialize(
     &game_of_life_metal_acceleration_data,
-    &game_of_life_parameters
+    &game_of_life_parameters,
+    &rand_result
   );
 
   if (
@@ -158,7 +180,9 @@ int main(
     game_of_life_destroy(
       &renderer,
       &game_of_life_parameters,
-      &game_of_life_metal_acceleration_data
+      &game_of_life_metal_acceleration_data,
+      &rand_result,
+      &rand_source
     );
   }
 
@@ -172,6 +196,11 @@ int main(
     index_y < game_of_life_parameters.size.y;
     ++index_y
   ) {
+    unsigned long int offset_y = (
+      index_y *
+      game_of_life_parameters.size.x
+    );
+
     for (
       unsigned int index_x = 0;
       index_x < game_of_life_parameters.size.x;
@@ -181,8 +210,11 @@ int main(
         index_y
       ][
         index_x
-      ] = (
-        rand() % 10 > 7 ? 1 : 0
+      ] = game_of_life_cell_transform(
+        rand_result.bytes[
+          offset_y +
+          index_x
+        ]
       );
     }
   }
@@ -248,10 +280,12 @@ int main(
     &renderer,
     &game_of_life_parameters,
     #if with_metal == 1
-    &game_of_life_metal_acceleration_data
+    &game_of_life_metal_acceleration_data,
     #else
-    cells_next
+    cells_next,
     #endif
+    &rand_result,
+    &rand_source
   );
 
   return 0;
@@ -261,10 +295,12 @@ void game_of_life_destroy(
   struct cexil_renderer* renderer,
   struct game_of_life_parameters* game_of_life_parameters,
   #if with_metal == 1
-  struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data
+  struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data,
   #else
-  char** cells_next
+  char** cells_next,
   #endif
+  struct rand_result* rand_result,
+  struct rand_source* rand_source
 ) {
   cexil_renderer_destroy(
     renderer
@@ -291,6 +327,11 @@ void game_of_life_destroy(
     cells_next
   );
   #endif
+
+  rand_clean(
+    rand_result,
+    rand_source
+  );
 }
 
 #endif

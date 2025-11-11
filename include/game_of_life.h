@@ -4,11 +4,14 @@
 #if rendering_mode == 2
 #include <game_of_life_parameters.h>
 
-#include <cexil.h>
-
 #if with_metal == 1
 #include <game_of_life_metal_acceleration_data.h>
 #endif
+
+#include <cexil.h>
+
+#include <rand_result.h>
+#include <rand_source.h>
 #endif
 
 int main(
@@ -21,10 +24,12 @@ void game_of_life_destroy(
   struct cexil_renderer*,
   struct game_of_life_parameters*,
   #if with_metal == 1
-  struct game_of_life_metal_acceleration_data*
+  struct game_of_life_metal_acceleration_data*,
   #else
-  char**
+  char**,
   #endif
+  struct rand_result*,
+  struct rand_source*
 );
 #endif
 

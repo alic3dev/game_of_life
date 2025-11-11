@@ -8,20 +8,30 @@
 
 #include <metil_scenes/scene.h>
 
+#include <rand_result.h>
+#include <rand_source.h>
+
 #include <CoreAudio/CoreAudio.h>
 #include <Metal/MTLDevice.h>
 
 struct game_of_life_3d_scene_data {
-  unsigned long int frame;
   #if with_metal == 1
   struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data;
   #else
   char** cells;
   char** cells_next;
   #endif
+  
   unsigned int length_cells;
-  struct game_of_life_parameters* game_of_life_parameters;
+
+  unsigned long int frame;
+
   unsigned int index_audio;
+
+  struct game_of_life_parameters* game_of_life_parameters;
+
+  struct rand_result rand_result;
+  struct rand_source rand_source;
 };
 
 void game_of_life_3d_scene_initialize(

@@ -3,6 +3,8 @@
 #if with_metal == 1
 #include <game_of_life_metal_acceleration.h>
 #include <game_of_life_metal_acceleration_data.h>
+#else
+#include <game_of_life_cell_transform.h>
 #endif
 
 #include <clic3_bytes.h>
@@ -15,6 +17,15 @@
 #include <metil_object.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_scenes/scene.h>
+
+#include <rand_clean.h>
+#include <rand_functions.h>
+#include <rand_initialize.h>
+#include <rand_mode.h>
+#include <rand_parameters.h>
+#include <rand_result.h>
+#include <rand_source.h>
+#include <rand_source_type.h>
 
 #if with_metal == 1
 #import <AppKit/NSApplication.h>
@@ -55,6 +66,25 @@ void game_of_life_3d_scene_initialize(
     game_of_life_3d_scene_data->game_of_life_parameters->size.y
   );
 
+
+  struct rand_parameters rand_parameters;
+
+  rand_initialize(
+    &rand_parameters,
+    &game_of_life_3d_scene_data->rand_result,
+    &game_of_life_3d_scene_data->rand_source,
+    game_of_life_3d_scene_data->length_cells,
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
+  rand_get(
+    &game_of_life_3d_scene_data->rand_source,
+    &game_of_life_3d_scene_data->rand_result,
+    &rand_parameters
+  );
+
+
   #if with_metal == 1
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data = malloc(
     sizeof(struct game_of_life_metal_acceleration_data)
@@ -68,7 +98,8 @@ void game_of_life_3d_scene_initialize(
 
   game_of_life_metal_acceleration_initialize(
     game_of_life_3d_scene_data->game_of_life_metal_acceleration_data,
-    game_of_life_3d_scene_data->game_of_life_parameters
+    game_of_life_3d_scene_data->game_of_life_parameters,
+    &game_of_life_3d_scene_data->rand_result
   );
 
   if (
@@ -109,13 +140,25 @@ void game_of_life_3d_scene_initialize(
       game_of_life_3d_scene_data->game_of_life_parameters->size.x
     );
 
+    unsigned long int offset_y = (
+      index_y *
+      game_of_life_3d_scene_data->game_of_life_parameters->size.x
+    );
+
     for (
       unsigned int index_x = 0;
       index_x < game_of_life_3d_scene_data->game_of_life_parameters->size.x;
       ++index_x
     ) {
-      game_of_life_3d_scene_data->cells[index_y][index_x] = (
-        rand() % 10 > 7 ? 1 : 0
+      game_of_life_3d_scene_data->cells[
+        index_y
+      ][
+        index_x
+      ] = game_of_life_cell_transform(
+        game_of_life_3d_scene_data->rand_result.bytes[
+          offset_y +
+          index_x
+        ]
       );
     }
   }
@@ -505,6 +548,11 @@ void game_of_life_3d_scene_destroy(
   #endif
 
   free(scene->data);
+
+  rand_clean(
+    &game_of_life_3d_scene_data->rand_result,
+    &game_of_life_3d_scene_data->rand_source
+  );
 }
 
 OSStatus game_of_life_3d_scene_io_proc(
