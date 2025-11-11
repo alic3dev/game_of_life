@@ -1,13 +1,21 @@
 #include <game_of_life_output_vertex.h>
 
-#include <metil_shader_types.h>
+#include <metil_rendering/metil_renderer_data_frame.h>
+#include <metil_rendering/metil_renderer_data_object.h>
+#include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
 #include <metal_stdlib>
 
 vertex game_of_life_output_vertex game_of_life_3d_vertex(
-  const device simd_float4* positions [[buffer(metil_kit_vertex_input_index_positions)]],
-  constant metil_kit_data_frame& data_frame [[buffer(metil_kit_vertex_input_index_frame_data)]],
-  constant metil_kit_data_frame_object& data [[buffer(metil_kit_vertex_input_index_data)]],
+  const device simd_float4* positions [[buffer(
+    metil_renderer_vertex_index_parameter_positions
+  )]],
+  constant struct metil_renderer_data_frame& data_frame [[buffer(
+    metil_renderer_vertex_index_parameter_data_frame
+  )]],
+  constant struct metil_renderer_data_object& data [[buffer(
+    metil_renderer_vertex_index_parameter_data_object
+  )]],
   unsigned int id_vertex [[vertex_id]]
 ) {
   game_of_life_output_vertex out;
