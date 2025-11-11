@@ -28,6 +28,8 @@ jobs:
         run: git config --global init.defaultBranch core
       - name: continuous_integration:repository->checkout
         uses: actions/checkout@v5
+        with:
+          path: game_of_life
       - name: cache_restore_cer0
         id: cache_restore_cer0
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cer0 == '1' }}
