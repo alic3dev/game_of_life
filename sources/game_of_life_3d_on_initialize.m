@@ -23,6 +23,10 @@ void game_of_life_3d_on_initialize(
     @"game_of_life_3d_vertex"
   );
 
+  metil_renderer_interface->rendering_properties->fps_display = (
+    game_of_life_parameters->fps_display
+  );
+
   metil_renderer_interface->rendering_properties->camera.height = 0.0f;
 
   game_of_life_3d_scene_initialize(
