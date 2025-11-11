@@ -63,7 +63,7 @@ unsigned char game_of_life_parameters_parse(
       "--frame-rate"
       #elif rendering_mode == 3
       ,
-      "--audio",
+      "--audio"
       #endif
     );
 
