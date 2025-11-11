@@ -7,12 +7,14 @@ on:
 env:
   enabled_caching: 1
   enabled_caching_cer0: 1
+  enabled_caching_cexil: 1
   enabled_caching_clic3: 1
   enabled_caching_interrupt_handler: 1
   enabled_caching_math_c: 1
   enabled_caching_metil: 1
   enabled_caching_rand: 1
   key_cache_cer0: cache_cer0_0_0_0
+  key_cache_cexil: cache_cexil_0_0_0
   key_cache_clic3: cache_clic3_0_0_0
   key_cache_interrupt_handler: cache_interrupt_handler_0_0_0
   key_cache_math_c: cache_math_c_0_0_0
@@ -35,6 +37,13 @@ jobs:
         with:
           path: cer0
           key: ${{ env.key_cache_cer0 }}
+      - name: cache_restore_cexil
+        id: cache_restore_cexil
+        if: ${{ env.enabled_caching == '1' && env.enabled_caching_cexil == '1' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: cexil
+          key: ${{ env.key_cache_cexil }}
       - name: cache_restore_clic3
         id: cache_restore_clic3
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_clic3 == '1' }}
@@ -76,6 +85,12 @@ jobs:
         with:
           repository: alic3dev/cer0
           path: cer0
+      - name: checkout_cexil
+        if: steps.cache_restore_cexil.outputs.cache-hit != 'true'
+        uses: actions/checkout@v5
+        with:
+          repository: alic3dev/cexil
+          path: cexil
       - name: checkout_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
         uses: actions/checkout@v5
@@ -106,6 +121,9 @@ jobs:
         with:
           repository: alic3dev/rand
           path: rand
+      - name: make_cexil
+        if: steps.cache_restore_cexil.outputs.cache-hit != 'true'
+        run: cd cexil && make
       - name: make_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
         run: cd clic3 && make
@@ -145,6 +163,13 @@ jobs:
         with:
           path: cer0
           key: ${{ env.key_cache_cer0 }}
+      - name: cache_save_cexil
+        id: cache_save_cexil
+        if: ${{ env.enabled_caching == '1' && env.enabled_caching_cexil == '1' && steps.cache_restore_cexil.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: cexil
+          key: ${{ env.key_cache_cexil }}
       - name: cache_save_clic3
         id: cache_save_clic3
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_clic3 == '1' && steps.cache_restore_clic3.outputs.cache-hit != 'true' }}
