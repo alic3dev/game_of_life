@@ -92,6 +92,7 @@ make run rendering_mode=3d with_metal=1
 - - [`cexil`](https://github.com/alic3dev/cexil)
 - - [`clic3`](https://github.com/alic3dev/clic3)
 - - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
+- - [`rand`](https://github.com/alic3dev/rand)
 
 ### requirements:3d
 
@@ -107,6 +108,7 @@ make run rendering_mode=3d with_metal=1
 - - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
 - - [`math_c`](https://github.com/alic3dev/math_c)
 - - [`metil`](https://github.com/alic3dev/metil)
+- - [`rand`](https://github.com/alic3dev/rand)
 
 #### frameworks
 
@@ -122,6 +124,7 @@ make run rendering_mode=3d with_metal=1
 - `directory_cexil`
 - `directory_clic3`
 - `directory_interrupt_handler`
+- `directory_rand`
 
 #### environment_variables:3d
 
@@ -130,6 +133,7 @@ make run rendering_mode=3d with_metal=1
 - `directory_interrupt_handler`
 - `directory_math_c`
 - `directory_metil`
+- `directory_rand`
 
 ### building
 
