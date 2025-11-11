@@ -8,7 +8,21 @@ implementation.of->{`game_of_life`}.utilizing->{[`cexil`](https://github.com/ali
 
 ### 3d
 
-<img width="1966" height="1250" alt="game_of_life:3d" src="https://github.com/user-attachments/assets/efd1b259-c365-45d1-b45c-cd208ca61a79" />
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 36 44" src="https://github.com/user-attachments/assets/d0b991e4-ce04-4b24-8fc0-d3eba055fdf2" />
+
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 37 56" src="https://github.com/user-attachments/assets/9564b18d-c014-4e2a-91e6-2dea4814df3e" />
+
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 36 32" src="https://github.com/user-attachments/assets/4dff77ac-ab8a-4ed2-9e31-87516328b82b" />
+  
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 49" src="https://github.com/user-attachments/assets/d68be008-b50a-4434-9d23-cc4e3f151530" />
+  
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 36 13" src="https://github.com/user-attachments/assets/1f40fa41-0d40-4726-a84f-0207ceb93f74" />
+
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 05" src="https://github.com/user-attachments/assets/ac1f2762-9775-41d6-a2cc-83321e6f8019" />
+
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 30" src="https://github.com/user-attachments/assets/03a498f5-f791-4731-9fa5-956c91d3bbb9" />
+
+<img width="1966" height="1250" alt="Screenshot 2025-11-10 at 21 35 38" src="https://github.com/user-attachments/assets/abd6a5fa-d8bf-4fa2-b214-a6c0e4d68b64" />
 
 ## running
 
