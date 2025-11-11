@@ -128,6 +128,9 @@ unsigned char game_of_life_parameters_parse(
 
           return 1;
         }
+
+        has_set_size_x = 1;
+
         break;
       }
       case 1: {
@@ -169,6 +172,9 @@ unsigned char game_of_life_parameters_parse(
           )
         );
         #endif
+
+        has_set_size_y = 1;
+
         break;
       }
       case 2: {
@@ -210,6 +216,9 @@ unsigned char game_of_life_parameters_parse(
 
           return 1;
         }
+
+        has_set_frame_rate = 1;
+
         break;
       }
       #elif rendering_mode == 3
@@ -278,6 +287,9 @@ unsigned char game_of_life_parameters_parse(
 
           return 1;
         }
+
+        has_set_rate_poll = 1;
+        
         break;
       }
       #endif
