@@ -44,6 +44,11 @@ jobs:
         with:
           repository: alic3dev/metil
           path: metil
+      - name: checkout_rand
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/rand
+          path: rand
       - name: make_clic3
         run: cd clic3 && make
       - name: make_cer0
@@ -56,6 +61,8 @@ jobs:
         run: cd math_c && make
       - name: make_metil
         run: cd metil && make
+      - name: make_rand
+        run: cd rand && make
       - name: make_game_of_life_2d
         run: cd game_of_life && make debug=0 rendering_mode=2d with_metal=0
       - name: make_game_of_life_clean
