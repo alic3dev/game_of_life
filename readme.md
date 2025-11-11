@@ -56,17 +56,19 @@ make run rendering_mode=3d with_metal=1
 
 #### \[2d|3d\]
 
-- `--size-x`: sets the cell grid width
-- `--size-y`: sets the cell grid height
-- `--rate-poll`: sets the rate in frames at which the cell grid is polled
+- `--help` : prints usage information
+- `--size-x` : sets the cell grid width
+- `--size-y` : sets the cell grid height
+- `--rate-poll` : sets the rate in frames at which the cell grid is polled
 
 #### 2d
 
-- `--frame-rate`: sets the frame rate
+- `--frame-rate` : sets the frame rate
 
 #### 3d
 
-- `--audio`: enables audio output from buffered cell grid
+- `--audio` : enables audio output from buffered cell grid
+- `--fps-display` : enables the frames per second display
 
 ## development
 

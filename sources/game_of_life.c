@@ -9,7 +9,9 @@
 #include <game_of_life_metal_acceleration_data.h>
 #endif
 #endif
+
 #include <game_of_life_parameters.h>
+#include <game_of_life_print_usage.h>
 #include <game_of_life_poll.h>
 
 #if rendering_mode == 2
@@ -39,7 +41,23 @@ int main(
   if (
     status_game_of_life_parameters_parse != 0
   ) {
+    game_of_life_print_usage(
+      parameters[0],
+      1
+    );
+
     return 1;
+  }
+
+  if (
+    game_of_life_parameters.help == 1
+  ) {
+    game_of_life_print_usage(
+      parameters[0],
+      0
+    );
+
+    return 0;
   }
 
   srand(
@@ -71,7 +89,23 @@ int main(
   if (
     status_game_of_life_parameters_parse != 0
   ) {
+    game_of_life_print_usage(
+      parameters[0],
+      1
+    );
+
     return 1;
+  }
+
+  if (
+    game_of_life_parameters.help == 1
+  ) {
+    game_of_life_print_usage(
+      parameters[0],
+      0
+    );
+
+    return 0;
   }
 
   interrupt_handler_initialize();
