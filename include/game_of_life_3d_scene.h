@@ -30,6 +30,7 @@ struct game_of_life_3d_scene_data {
 
   struct game_of_life_parameters* game_of_life_parameters;
 
+  struct rand_parameters rand_parameters;
   struct rand_result rand_result;
   struct rand_source rand_source;
 };
@@ -39,6 +40,12 @@ void game_of_life_3d_scene_initialize(
   id<MTLDevice>,
   struct game_of_life_parameters*
 );
+
+#if with_metal != 1
+void game_of_life_generate_initial_generation(
+  struct game_of_life_3d_scene_data*
+);
+#endif
 
 void game_of_life_3d_scene_poll(
   struct metil_scene*

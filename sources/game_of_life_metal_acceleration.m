@@ -6,7 +6,7 @@
 
 #include <clic3_vector.h>
 
-#include <rand_result.h>
+#include <rand_functions.h>
 
 #include <Metal/MTLBuffer.h>
 #include <Metal/MTLCommandBuffer.h>
@@ -17,8 +17,7 @@
 
 void game_of_life_metal_acceleration_initialize(
   struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data,
-  struct game_of_life_parameters* game_of_life_parameters,
-  struct rand_result* rand_result
+  struct game_of_life_parameters* game_of_life_parameters
 ) {
   game_of_life_metal_acceleration_data->error = (
     game_of_life_metal_acceleration_data_error_none
@@ -122,19 +121,19 @@ void game_of_life_metal_acceleration_initialize(
 
   game_of_life_metal_acceleration_data->buffer_cells = [
     (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
-    newBufferWithLength: rand_result->length
+    newBufferWithLength: game_of_life_metal_acceleration_data->rand_result->length
     options: MTLResourceStorageModeShared
   ];
 
   game_of_life_metal_acceleration_data->buffer_cells_next = [
     (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
-    newBufferWithLength: rand_result->length
+    newBufferWithLength: game_of_life_metal_acceleration_data->rand_result->length
     options: MTLResourceStorageModeShared
   ];
 
   game_of_life_metal_acceleration_data->buffer_living_neighbors = [
     (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
-    newBufferWithLength: rand_result->length
+    newBufferWithLength: game_of_life_metal_acceleration_data->rand_result->length
     options: MTLResourceStorageModeShared
   ];
 
@@ -148,7 +147,7 @@ void game_of_life_metal_acceleration_initialize(
     (id<MTLDevice>) game_of_life_metal_acceleration_data->metal_device
     newBufferWithBytes: size
     length: sizeof(unsigned long int) * 3
-    options: MTLResourceStorageModePrivate
+    options: MTLResourceStorageModeShared
   ];
 
   if (
@@ -163,31 +162,57 @@ void game_of_life_metal_acceleration_initialize(
     return;
   }
 
-  char* cells = (
+  game_of_life_generate_initial_generation(
+    game_of_life_metal_acceleration_data
+  );
+
+  game_of_life_metal_acceleration_data->cells = (
     (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
   ).contents;
 
-  for (
-    unsigned int index_cell = 0;
-    index_cell < rand_result->length;
-    ++index_cell
-  ) {
-    cells[
-      index_cell
-    ] = game_of_life_cell_transform(
-      rand_result->bytes[
-        index_cell
-      ]
-    );
-  }
+  game_of_life_metal_acceleration_data->living_neighbors = (
+    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
+  ).contents;
+}
+
+void game_of_life_generate_initial_generation(
+  struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data
+) {
+  rand_get(
+    game_of_life_metal_acceleration_data->rand_source,
+    game_of_life_metal_acceleration_data->rand_result,
+    game_of_life_metal_acceleration_data->rand_parameters
+  );
+
+  char* cells = (
+    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
+  ).contents;
 
   char* living_neighbors = (
     (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
   ).contents;
 
+  unsigned long int* size = (
+    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_size
+  ).contents;
+
   for (
     unsigned int index_cell = 0;
-    index_cell < rand_result->length;
+    index_cell < game_of_life_metal_acceleration_data->rand_result->length;
+    ++index_cell
+  ) {
+    cells[
+      index_cell
+    ] = game_of_life_cell_transform(
+      game_of_life_metal_acceleration_data->rand_result->bytes[
+        index_cell
+      ]
+    );
+  }
+
+  for (
+    unsigned int index_cell = 0;
+    index_cell < game_of_life_metal_acceleration_data->rand_result->length;
     ++index_cell
   ) {
     unsigned long int index_x = index_cell % size[0];
@@ -224,112 +249,125 @@ void game_of_life_metal_acceleration_initialize(
       }
     }
   }
-
-  game_of_life_metal_acceleration_data->cells = cells;
-  game_of_life_metal_acceleration_data->living_neighbors = living_neighbors;
 }
 
 void game_of_life_metal_acceleration_compute(
   struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data,
   struct game_of_life_parameters* game_of_life_parameters
 ) {
-  id<MTLCommandBuffer> buffer_command = [
-    (id<MTLCommandQueue>) game_of_life_metal_acceleration_data->command_queue
-    commandBuffer
-  ];
+  unsigned int length_generations = (
+    game_of_life_parameters->lock_to_generation == 0
+    ? 1
+    : game_of_life_parameters->lock_to_generation - 1
+  );
 
-  id<MTLComputeCommandEncoder> encoder_command_compute = [
-    buffer_command computeCommandEncoder
-  ];
+  for (
+    unsigned int index_generated_generations = 0;
+    index_generated_generations < length_generations;
+    ++index_generated_generations
+  ) {
+    id<MTLCommandBuffer> buffer_command = [
+      (id<MTLCommandQueue>) game_of_life_metal_acceleration_data->command_queue
+      commandBuffer
+    ];
 
-  [encoder_command_compute
-    setComputePipelineState: (
+    id<MTLComputeCommandEncoder> encoder_command_compute = [
+      buffer_command computeCommandEncoder
+    ];
+
+    [encoder_command_compute
+      setComputePipelineState: (
+        (id<MTLComputePipelineState>) (
+          game_of_life_metal_acceleration_data->pipeline_state_compute
+        )
+      )
+    ];
+
+    [encoder_command_compute
+      setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
+      offset: 0
+      atIndex: 0
+    ];
+
+    [encoder_command_compute
+      setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells_next
+      offset: 0
+      atIndex: 1
+    ];
+
+    [encoder_command_compute
+      setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
+      offset: 0
+      atIndex: 2
+    ];
+
+    [encoder_command_compute
+      setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_size
+      offset: 0
+      atIndex: 3
+    ];
+
+    unsigned long int length_buffer = (
+      (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
+    ).length;
+
+    MTLSize size_grid = MTLSizeMake(
+      length_buffer,
+      1,
+      1
+    );
+
+    unsigned long int length_group_thread = (
       (id<MTLComputePipelineState>) (
         game_of_life_metal_acceleration_data->pipeline_state_compute
       )
-    )
-  ];
+    ).maxTotalThreadsPerThreadgroup;
 
-  [encoder_command_compute
-    setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
-    offset: 0
-    atIndex: 0
-  ];
+    if (
+      length_buffer < length_group_thread
+    ) {
+      length_group_thread = length_buffer;
+    }
 
-  [encoder_command_compute
-    setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells_next
-    offset: 0
-    atIndex: 1
-  ];
+    MTLSize size_group_thread = MTLSizeMake(
+      length_group_thread,
+      1,
+      1
+    );
 
-  [encoder_command_compute
-    setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
-    offset: 0
-    atIndex: 2
-  ];
+    [encoder_command_compute
+      dispatchThreads: size_grid
+      threadsPerThreadgroup: size_group_thread
+    ];
 
-  [encoder_command_compute
-    setBuffer: (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_size
-    offset: 0
-    atIndex: 3
-  ];
+    [encoder_command_compute endEncoding];
+    [buffer_command commit];
+    [buffer_command waitUntilCompleted];
 
-  unsigned long int length_buffer = (
-    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
-  ).length;
+    char* cells = (
+      (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
+    ).contents;
 
-  MTLSize size_grid = MTLSizeMake(
-    length_buffer,
-    1,
-    1
-  );
+    char* cells_next = (
+      (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells_next
+    ).contents;
 
-  unsigned long int length_group_thread = (
-    (id<MTLComputePipelineState>) (
-      game_of_life_metal_acceleration_data->pipeline_state_compute
-    )
-  ).maxTotalThreadsPerThreadgroup;
-
-  if (
-    length_buffer < length_group_thread
-  ) {
-    length_group_thread = length_buffer;
+    for (
+      unsigned int index_cell = 0;
+      index_cell < length_buffer;
+      ++index_cell
+    ) {
+      cells[
+        index_cell
+      ] = cells_next[
+        index_cell
+      ];
+    }
   }
-
-  MTLSize size_group_thread = MTLSizeMake(
-    length_group_thread,
-    1,
-    1
-  );
-
-  [encoder_command_compute
-    dispatchThreads: size_grid
-    threadsPerThreadgroup: size_group_thread
-  ];
-
-  [encoder_command_compute endEncoding];
-  [buffer_command commit];
-  [buffer_command waitUntilCompleted];
 
   char* cells = (
     (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells
   ).contents;
-
-  char* cells_next = (
-    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_cells_next
-  ).contents;
-
-  for (
-    unsigned int index_cell = 0;
-    index_cell < length_buffer;
-    ++index_cell
-  ) {
-    cells[
-      index_cell
-    ] = cells_next[
-      index_cell
-    ];
-  }
 
   char* living_neighbors = (
     (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors

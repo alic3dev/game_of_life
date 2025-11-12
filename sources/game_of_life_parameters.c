@@ -15,6 +15,7 @@ unsigned char game_of_life_parameters_parse(
   int length_parameters,
   const char** parameters
 ) {
+  game_of_life_parameters->lock_to_generation = 0;
   game_of_life_parameters->help = 0;
 
   #if rendering_mode == 2
@@ -42,6 +43,7 @@ unsigned char game_of_life_parameters_parse(
   game_of_life_parameters->rate_poll = 0;
   #endif
 
+  unsigned char has_set_lock_to_generation = 0;
   unsigned char has_set_size_x = 0;
   unsigned char has_set_size_y = 0;
 
@@ -59,18 +61,17 @@ unsigned char game_of_life_parameters_parse(
     int index_parameter_supplied = clic3_char_arrays_within(
       (char*) parameters[index_parameter],
       #if rendering_mode == 2
-      4,
+      5,
       #elif rendering_mode == 3
-      6,
+      7,
       #endif
       "--size-x",
       "--size-y",
-      "--help"
+      "--help",
+      "--lock-to-generation",
       #if rendering_mode == 2
-      ,
       "--frame-rate"
       #elif rendering_mode == 3
-      ,
       "--audio",
       "--fps-display",
       "--rate-poll"
@@ -182,8 +183,45 @@ unsigned char game_of_life_parameters_parse(
 
         return 0;
       }
-      #if rendering_mode == 2
       case 3: {
+        if (
+          has_set_lock_to_generation == 1
+        ) {
+          fprintf(
+            stderr,
+            message_parameter_already_set,
+            parameters[index_parameter]
+          );
+          return 1;
+        }
+
+        index_parameter = (
+          index_parameter + 1
+        );
+
+        unsigned char status_int_conversion = clic3_char_array_to_unsigned_int(
+          (char*) parameters[index_parameter],
+          &game_of_life_parameters->lock_to_generation
+        );
+
+        if (
+          status_int_conversion != 0 ||
+          game_of_life_parameters->lock_to_generation < 1
+        ) {
+          fprintf(
+            stderr,
+            "invalid_lock_to_generation->{%s}\n",
+            parameters[index_parameter]
+          );
+
+          return 1;
+        }
+
+        has_set_lock_to_generation = 1;
+        break;
+      }
+      #if rendering_mode == 2
+      case 4: {
         if (
           has_set_frame_rate == 1
         ) {
@@ -222,7 +260,7 @@ unsigned char game_of_life_parameters_parse(
         break;
       }
       #elif rendering_mode == 3
-      case 3: {
+      case 4: {
         if (
           game_of_life_parameters->audio == 1
         ) {
@@ -238,7 +276,7 @@ unsigned char game_of_life_parameters_parse(
         game_of_life_parameters->audio = 1;
         break;
       }
-      case 4: {
+      case 5: {
         if (
           game_of_life_parameters->fps_display == 1
         ) {
@@ -254,7 +292,7 @@ unsigned char game_of_life_parameters_parse(
         game_of_life_parameters->fps_display = 1;
         break;
       }
-      case 5: {
+      case 6: {
         if (
           has_set_rate_poll == 1
         ) {

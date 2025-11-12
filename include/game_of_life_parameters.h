@@ -4,6 +4,8 @@
 #include <clic3_vector.h>
 
 struct game_of_life_parameters {
+  unsigned int lock_to_generation;
+
   struct clic3_vector2_unsigned_int size;
   struct clic3_vector2_unsigned_int offset;
 

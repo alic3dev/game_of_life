@@ -3,6 +3,10 @@
 
 #include <game_of_life_metal_acceleration_data_error.h>
 
+#include <rand_parameters.h>
+#include <rand_result.h>
+#include <rand_source.h>
+
 struct game_of_life_metal_acceleration_data {
   void* metal_device;
   void* library;
@@ -16,7 +20,11 @@ struct game_of_life_metal_acceleration_data {
 
   char* cells;
   char* living_neighbors;
-  
+
+  struct rand_parameters* rand_parameters;
+  struct rand_result* rand_result;
+  struct rand_source* rand_source;
+
   enum game_of_life_metal_acceleration_data_error error;
 };
 

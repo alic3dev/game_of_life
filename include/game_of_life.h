@@ -20,6 +20,16 @@ int main(
 );
 
 #if rendering_mode == 2
+#if with_metal != 1
+void game_of_life_generate_initial_generation(
+  struct game_of_life_parameters*,
+  char**,
+  struct rand_parameters*,
+  struct rand_result*,
+  struct rand_source*
+);
+#endif
+
 void game_of_life_destroy(
   struct cexil_renderer*,
   struct game_of_life_parameters*,
