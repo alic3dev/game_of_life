@@ -81,15 +81,16 @@ void game_of_life_print_usage(
   fprintf(
     stream_output,
     "usage: %s\n"
-    "  --help                  : prints this usage information\n"
-    "  --size-x [#integer]     : sets the cell grid width\n"
-    "  --size-y [#integer]     : sets the cell grid height\n"
+    "  --help                          : prints this usage information\n"
+    "  --lock-to-generation [#integer] : regenerates and displays only a single generation\n"
+    "  --size-x [#integer]             : sets the cell grid width\n"
+    "  --size-y [#integer]             : sets the cell grid height\n"
     #if rendering_mode == 2
-    "  --frame-rate [#integer] : sets the frame rate\n"
+    "  --frame-rate [#integer]         : sets the frame rate\n"
     #elif rendering_mode == 3
-    "  --audio                 : enables audio output from buffered cell grid\n"
-    "  --fps-display           : enables the frames per second display\n"
-    "  --rate-poll [#integer]  : sets the rate in frames at which the cell grid is polled\n"
+    "  --audio                         : enables audio output from buffered cell grid\n"
+    "  --fps-display                   : enables the frames per second display\n"
+    "  --rate-poll [#integer]          : sets the rate in frames at which the cell grid is polled\n"
     #endif
     ,
     basename

@@ -8,8 +8,11 @@
 
 void game_of_life_metal_acceleration_initialize(
   struct game_of_life_metal_acceleration_data*,
-  struct game_of_life_parameters*,
-  struct rand_result*
+  struct game_of_life_parameters*
+);
+
+void game_of_life_generate_initial_generation(
+  struct game_of_life_metal_acceleration_data*
 );
 
 void game_of_life_metal_acceleration_compute(

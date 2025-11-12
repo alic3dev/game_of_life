@@ -66,24 +66,14 @@ void game_of_life_3d_scene_initialize(
     game_of_life_3d_scene_data->game_of_life_parameters->size.y
   );
 
-
-  struct rand_parameters rand_parameters;
-
   rand_initialize(
-    &rand_parameters,
+    &game_of_life_3d_scene_data->rand_parameters,
     &game_of_life_3d_scene_data->rand_result,
     &game_of_life_3d_scene_data->rand_source,
     game_of_life_3d_scene_data->length_cells,
     rand_mode_bytes,
     rand_source_type_divisive
   );
-
-  rand_get(
-    &game_of_life_3d_scene_data->rand_source,
-    &game_of_life_3d_scene_data->rand_result,
-    &rand_parameters
-  );
-
 
   #if with_metal == 1
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data = malloc(
@@ -95,11 +85,13 @@ void game_of_life_3d_scene_initialize(
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->function_compute = (void*)0;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->pipeline_state_compute = (void*)0;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->error = game_of_life_metal_acceleration_data_error_none;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->rand_parameters = &game_of_life_3d_scene_data->rand_parameters;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->rand_result = &game_of_life_3d_scene_data->rand_result;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->rand_source = &game_of_life_3d_scene_data->rand_source;
 
   game_of_life_metal_acceleration_initialize(
     game_of_life_3d_scene_data->game_of_life_metal_acceleration_data,
-    game_of_life_3d_scene_data->game_of_life_parameters,
-    &game_of_life_3d_scene_data->rand_result
+    game_of_life_3d_scene_data->game_of_life_parameters
   );
 
   if (
@@ -139,29 +131,11 @@ void game_of_life_3d_scene_initialize(
       sizeof(unsigned char) *
       game_of_life_3d_scene_data->game_of_life_parameters->size.x
     );
-
-    unsigned long int offset_y = (
-      index_y *
-      game_of_life_3d_scene_data->game_of_life_parameters->size.x
-    );
-
-    for (
-      unsigned int index_x = 0;
-      index_x < game_of_life_3d_scene_data->game_of_life_parameters->size.x;
-      ++index_x
-    ) {
-      game_of_life_3d_scene_data->cells[
-        index_y
-      ][
-        index_x
-      ] = game_of_life_cell_transform(
-        game_of_life_3d_scene_data->rand_result.bytes[
-          offset_y +
-          index_x
-        ]
-      );
-    }
   }
+
+  game_of_life_generate_initial_generation(
+    game_of_life_3d_scene_data
+  );
   #endif
 
   scene->length_objects = game_of_life_3d_scene_data->length_cells;
@@ -327,6 +301,46 @@ void game_of_life_3d_scene_initialize(
   #endif
 }
 
+#if with_metal != 1
+void game_of_life_generate_initial_generation(
+  struct game_of_life_3d_scene_data* game_of_life_3d_scene_data
+) {
+  rand_get(
+    &game_of_life_3d_scene_data->rand_source,
+    &game_of_life_3d_scene_data->rand_result,
+    &game_of_life_3d_scene_data->rand_parameters
+  );
+  
+  for (
+    unsigned int index_y = 0;
+    index_y < game_of_life_3d_scene_data->game_of_life_parameters->size.y;
+    ++index_y
+  ) {
+    unsigned long int offset_y = (
+      index_y *
+      game_of_life_3d_scene_data->game_of_life_parameters->size.x
+    );
+
+    for (
+      unsigned int index_x = 0;
+      index_x < game_of_life_3d_scene_data->game_of_life_parameters->size.x;
+      ++index_x
+    ) {
+      game_of_life_3d_scene_data->cells[
+        index_y
+      ][
+        index_x
+      ] = game_of_life_cell_transform(
+        game_of_life_3d_scene_data->rand_result.bytes[
+          offset_y +
+          index_x
+        ]
+      );
+    }
+  }
+}
+#endif
+
 void game_of_life_3d_scene_poll(
   struct metil_scene* scene
 ) {
@@ -349,6 +363,20 @@ void game_of_life_3d_scene_poll(
   }
 
   game_of_life_3d_scene_data->frame = 0;
+
+  if (
+    game_of_life_parameters->lock_to_generation != 0
+  ) {
+    #if with_metal == 1
+    game_of_life_generate_initial_generation(
+      game_of_life_3d_scene_data->game_of_life_metal_acceleration_data
+    );
+    #else
+    game_of_life_generate_initial_generation(
+      game_of_life_3d_scene_data
+    );
+    #endif
+  }
 
   #if with_metal == 1
   game_of_life_metal_acceleration_compute(
@@ -390,95 +418,107 @@ void game_of_life_3d_scene_poll(
     data->color.z = data->color.x;
   }
   #else
+  unsigned int count_generations = (
+    game_of_life_parameters->lock_to_generation
+    ? game_of_life_parameters->lock_to_generation - 1
+    : 1
+  );
+
   for (
-    unsigned int index_y = 0;
-    index_y < game_of_life_parameters->size.y;
-    ++index_y
-  ) {
-    unsigned int offset_y = index_y * game_of_life_parameters->size.x;
-
+    unsigned int index_generated_generation = 0;
+    index_generated_generation < count_generations;
+    ++index_generated_generation
+  ) { 
     for (
-      unsigned int index_x = 0;
-      index_x < game_of_life_parameters->size.x;
-      ++index_x
+      unsigned int index_y = 0;
+      index_y < game_of_life_parameters->size.y;
+      ++index_y
     ) {
-      unsigned int living_neighbors = 0;
+      unsigned int offset_y = index_y * game_of_life_parameters->size.x;
 
-      const unsigned int index_object = offset_y + index_x;
-      
       for (
-        unsigned int index_neighbour_y = index_y == 0 ? 1 : index_y - 1;
-        index_neighbour_y < index_y + 2;
-        ++index_neighbour_y
+        unsigned int index_x = 0;
+        index_x < game_of_life_parameters->size.x;
+        ++index_x
       ) {
-        for (
-          unsigned int index_neighbour_x = index_x == 0 ? 1 : index_x - 1;
-          index_neighbour_x < index_x + 2;
-          ++index_neighbour_x
-        ) {
-          if (
-            (index_neighbour_y == index_y && index_neighbour_x == index_x) ||
-            index_neighbour_y >= game_of_life_parameters->size.y ||
-            index_neighbour_x >= game_of_life_parameters->size.x
-          ) {
-            continue;
-          }
+        unsigned int living_neighbors = 0;
 
-          if (
-            game_of_life_3d_scene_data->cells[index_neighbour_y][index_neighbour_x] == 1
+        const unsigned int index_object = offset_y + index_x;
+        
+        for (
+          unsigned int index_neighbour_y = index_y == 0 ? 1 : index_y - 1;
+          index_neighbour_y < index_y + 2;
+          ++index_neighbour_y
+        ) {
+          for (
+            unsigned int index_neighbour_x = index_x == 0 ? 1 : index_x - 1;
+            index_neighbour_x < index_x + 2;
+            ++index_neighbour_x
           ) {
-            living_neighbors = (
-              living_neighbors + 1
-            );
+            if (
+              (index_neighbour_y == index_y && index_neighbour_x == index_x) ||
+              index_neighbour_y >= game_of_life_parameters->size.y ||
+              index_neighbour_x >= game_of_life_parameters->size.x
+            ) {
+              continue;
+            }
+
+            if (
+              game_of_life_3d_scene_data->cells[index_neighbour_y][index_neighbour_x] == 1
+            ) {
+              living_neighbors = (
+                living_neighbors + 1
+              );
+            }
           }
         }
-      }
 
-      struct metil_renderer_data_object* data = scene->objects[
-        index_object
-      ]->data.contents;
-
-      if (
-        (game_of_life_3d_scene_data->cells[index_y][index_x] == 1 && living_neighbors == 2) || 
-        living_neighbors == 3
-      ) {
-        game_of_life_3d_scene_data->cells_next[index_y][index_x] = 1;
-
-        scene->objects[
+        struct metil_renderer_data_object* data = scene->objects[
           index_object
-        ]->position.z = 100.0f;
+        ]->data.contents;
 
-        data->color.x = (float) living_neighbors / 3.0f;
-        data->color.y = (float) living_neighbors / 3.0f;
-        data->color.z = (float) living_neighbors / 3.0f;
-      } else {
-        game_of_life_3d_scene_data->cells_next[index_y][index_x] = 0;
+        if (
+          (game_of_life_3d_scene_data->cells[index_y][index_x] == 1 && living_neighbors == 2) || 
+          living_neighbors == 3
+        ) {
+          game_of_life_3d_scene_data->cells_next[index_y][index_x] = 1;
 
-        data->color.x = (float) living_neighbors / 8.0f;
-        data->color.y = (float) living_neighbors / 16.0f;
-        data->color.z = (float) living_neighbors / 16.0f;
+          scene->objects[
+            index_object
+          ]->position.z = 100.0f;
 
-        scene->objects[
-          index_object
-        ]->position.z = (
-          101.0f + 8.0f - living_neighbors
-        );
+          data->color.x = (float) living_neighbors / 3.0f;
+          data->color.y = (float) living_neighbors / 3.0f;
+          data->color.z = (float) living_neighbors / 3.0f;
+        } else {
+          game_of_life_3d_scene_data->cells_next[index_y][index_x] = 0;
+
+          data->color.x = (float) living_neighbors / 8.0f;
+          data->color.y = (float) living_neighbors / 16.0f;
+          data->color.z = (float) living_neighbors / 16.0f;
+
+          scene->objects[
+            index_object
+          ]->position.z = (
+            101.0f + 8.0f - living_neighbors
+          );
+        }
       }
     }
-  }
 
-  for (
-    unsigned int index_y = 0;
-    index_y < game_of_life_parameters->size.y;
-    ++index_y
-  ) {
-    clic3_bytes_copy(
-      game_of_life_3d_scene_data->cells[index_y],
-      game_of_life_3d_scene_data->cells_next[index_y], (
-        sizeof(unsigned char) *
-        game_of_life_parameters->size.x
-      )
-    );
+    for (
+      unsigned int index_y = 0;
+      index_y < game_of_life_parameters->size.y;
+      ++index_y
+    ) {
+      clic3_bytes_copy(
+        game_of_life_3d_scene_data->cells[index_y],
+        game_of_life_3d_scene_data->cells_next[index_y], (
+          sizeof(unsigned char) *
+          game_of_life_parameters->size.x
+        )
+      );
+    }
   }
   #endif
 }
