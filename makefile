@@ -10,6 +10,23 @@ endif
 endif
 endif
 
+target_device=mac
+
+ifndef target_device_version
+target_device_version=26.1
+endif
+
+ifndef target_standard_metal
+target_standard_metal=metal4.0
+endif
+
+target_platform=arm64-apple-macos${target_device_version}
+target_platform_metal=air64-apple-macos${target_device_version_metal}
+
+directory_macos_sdk=${shell xcrun --sdk macosx${target_device_version} --show-sdk-path}
+
+c_flags_platform=-target ${target_platform} -isysroot ${directory_macos_sdk}
+
 directory_objects_base=objects
 directory_output_base=output
 
@@ -74,25 +91,33 @@ directory_clic3=../clic3
 endif
 
 directory_clic3_include=${directory_clic3}/include
-directory_clic3_library=${directory_clic3}/library
+directory_clic3_library=${directory_clic3}/library/macos/release
 
 ifndef directory_interrupt_handler
 directory_interrupt_handler=../interrupt_handler
 endif
 
 directory_interrupt_handler_include=${directory_interrupt_handler}/include
-directory_interrupt_handler_library=${directory_interrupt_handler}/library
+directory_interrupt_handler_library=${directory_interrupt_handler}/library/macos/release
 
 ifndef directory_rand
 directory_rand=../rand
 endif
 
 directory_rand_include=${directory_rand}/include
-directory_rand_library=${directory_rand}/library
+directory_rand_library=${directory_rand}/library/macos/release
 
-file_clic3_library=${directory_clic3_library}/clic3.o
-file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.o
-file_rand_library=${directory_rand_library}/rand.o
+version_target_cer0=0
+version_target_cexil=0
+version_target_clic3=0
+version_target_interrupt_handler=0
+version_target_math_c=0
+version_target_metil=0
+version_target_rand=0
+
+file_clic3_library=${directory_clic3_library}/clic3.${version_target_clic3}.dylib
+file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.${version_target_interrupt_handler}.dylib
+file_rand_library=${directory_rand_library}/rand.${version_target_rand}.dylib
 
 file_metalar=${directory_metalar}/${name}.metalar
 file_output_metal=${directory_output}/default.metallib
@@ -131,7 +156,6 @@ files_objects_c=${patsubst ${directory_sources}/%.c,${directory_objects_c}/%.o,$
 files_objects_objective_c=${patsubst ${directory_sources}/%.m,${directory_objects_objective_c}/%.o,${files_sources_objective_c}}
 
 c_flags_includes=-I${directory_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include} -I${directory_rand_include}
-c_flags_platform=-target ${target_platform} -isysroot ${directory_macos_sdk}
 
 ifeq (${rendering_mode},2d)
 file_output=${directory_output}/${name}
@@ -141,9 +165,9 @@ directory_cexil=../cexil
 endif
 
 directory_cexil_include=${directory_cexil}/include
-directory_cexil_library=${directory_cexil}/library
+directory_cexil_library=${directory_cexil}/library/macos/release
 
-file_library_cexil=${directory_cexil_library}/*.o
+file_library_cexil=${directory_cexil_library}/cexil.${version_target_cexil}.dylib
 
 files_libraries:=${files_libraries} ${file_library_cexil}
 
@@ -177,7 +201,6 @@ uses_metal=1
 endif
 
 ifeq (${uses_metal},1)
-directory_macos_sdk=${shell xcrun --show-sdk-path}
 
 ifndef directory_cer0
 directory_cer0=../cer0
@@ -200,32 +223,22 @@ directory_metil_library=${directory_metil}/library_debug
 file_metil_library=${directory_metil_library}/metil_debug.o
 else
 directory_metil_library=${directory_metil}/library
-file_metil_library=${directory_metil_library}/metil.o
+file_metil_library=${directory_metil_library}/metil.${version_target_metil}.dylib
 endif
 
-directory_cer0_library=${directory_cer0}/library
-directory_math_c_library=${directory_math_c}/library
+directory_cer0_library=${directory_cer0}/library/macos/release
+directory_math_c_library=${directory_math_c}/library/macos/release
 
 file_metil_metallib=${directory_metil_library}/metil.metallib
 file_metil_storyboard=${directory_metil_library}/metil.storyboardc
-file_cer0_library=${directory_cer0_library}/cer0.o
-file_math_c_library=${directory_math_c_library}/math_c.o
+file_cer0_library=${directory_cer0_library}/cer0.${version_target_cer0}.dylib
+file_math_c_library=${directory_math_c_library}/math_c.${version_target_math_c}.dylib
 
 files_libraries:=${files_libraries} ${file_cer0_library} ${file_math_c_library} ${file_metil_library}
 
 cc=clang
 
 frameworks=Metal MetalKit GameController CoreAudio CoreGraphics CoreText
-
-target_device=mac
-
-ifndef target_macos_version
-target_macos_version=26.0
-endif
-
-target_macos_version_metal=${target_macos_version}
-target_platform=arm64-apple-macos${target_macos_version}
-target_platform_metal=air64-apple-macos${target_macos_version_metal}
 
 c_flags_includes:=${c_flags_includes} -I${directory_metil_include} -I${directory_cer0_include} -I${directory_math_c_include}
 c_flags_c:=${c_flags_c} ${c_flags_platform}
@@ -236,7 +249,7 @@ c_flags_output=${c_flags_platform} ${c_flags_frameworks}
 metal=xcrun -sdk macosx metal
 metal_ar=xcrun -sdk macosx metal-ar
 metallib=xcrun -sdk macosx metallib
-metal_flags_common=-target ${target_platform_metal}
+metal_flags_common=-target ${target_platform_metal} -std=${target_standard_metal}
 metal_flags=${metal_flags_common} -I${directory_include} -I${directory_clic3_include} -I${directory_metil_include} -isysroot ${directory_macos_sdk}
 
 ifneq (${disable_metal_fast_options}, 1)
@@ -245,8 +258,8 @@ endif
 
 metal_flags_output=
 else
-cc=gcc
-c_flags_output=
+cc=clang
+c_flags_output=${c_flags_platform}
 endif
 
 c_flags_debug_objective_c=-O0 -g -v
