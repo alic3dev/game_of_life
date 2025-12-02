@@ -20,7 +20,7 @@ unsigned char game_of_life_parameters_parse(
 
   #if rendering_mode == 2
   struct cexil_size size_renderer;
-  
+
   cexil_size_set_to_terminal(
     &size_renderer
   );
@@ -233,11 +233,11 @@ unsigned char game_of_life_parameters_parse(
 
           return 1;
         }
-        
+
         index_parameter = (
           index_parameter + 1
         );
- 
+
         unsigned char status_float_conversion = clic3_char_array_to_float(
           (char*) parameters[index_parameter],
           &game_of_life_parameters->rate_frames
@@ -304,11 +304,11 @@ unsigned char game_of_life_parameters_parse(
 
           return 1;
         }
-        
+
         index_parameter = (
           index_parameter + 1
         );
- 
+
         unsigned char status_unsigned_int_conversion = clic3_char_array_to_unsigned_int(
           (char*) parameters[index_parameter],
           &game_of_life_parameters->rate_poll
@@ -327,11 +327,11 @@ unsigned char game_of_life_parameters_parse(
         }
 
         has_set_rate_poll = 1;
-        
+
         break;
       }
       #endif
-      default: 
+      default: {
         fprintf(
           stderr,
           "unknown_parameter->{%s}\n",
@@ -340,6 +340,7 @@ unsigned char game_of_life_parameters_parse(
 
         return 1;
         break;
+      }
     }
   }
 

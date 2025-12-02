@@ -18,7 +18,7 @@ void game_of_life_poll(
       ++index_x
     ) {
       unsigned int living_neighbors = 0;
-      
+
       for (
         unsigned int index_neighbour_y = index_y == 0 ? 1 : index_y - 1;
         index_neighbour_y < index_y + 2;
@@ -48,7 +48,7 @@ void game_of_life_poll(
       }
 
       if (
-        (cells[index_y][index_x] == 1 && living_neighbors == 2) || 
+        (cells[index_y][index_x] == 1 && living_neighbors == 2) ||
         living_neighbors == 3
       ) {
         cells_next[index_y][index_x] = 1;

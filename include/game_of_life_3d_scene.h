@@ -21,7 +21,7 @@ struct game_of_life_3d_scene_data {
   char** cells;
   char** cells_next;
   #endif
-  
+
   unsigned int length_cells;
 
   unsigned long int frame;
