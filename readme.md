@@ -92,8 +92,10 @@ make run rendering_mode=3d with_metal=1
 - os->{`macos`}
 - - version.minimum->{`15.0`};
 - - - defaults:to->{`26.0`};
-- - - override_with:`target_macos_version`
+- - - override_with:`target_device_version`
 - - with->{`metal`}.support();
+- - - standard.default->{`metal4.0`}
+- - - override_with:`target_metal_standard`
 
 - [`alic3`](https://github.com/alic3dev):libraries
 - - [`cer0`](https://github.com/alic3dev/cer0)
