@@ -20,8 +20,8 @@ env:
   key_cache_math_c: cache_math_c_0_0_0
   key_cache_metil: cache_metil_0_0_0
   key_cache_rand: cache_rand_0_0_0
-  target_device_version_macos: 15.5
-  target_standard_metal: metal3.2
+  target_device_version: 15.5
+  target_metal_standard: metal3.2
 jobs:
   continuous_integration_build:
     runs-on: macos-latest
@@ -125,39 +125,39 @@ jobs:
           path: rand
       - name: make_cexil
         if: steps.cache_restore_cexil.outputs.cache-hit != 'true'
-        run: cd cexil && make cexil_dylib target_device_version=${{ env.target_device_version_macos }}
+        run: cd cexil && make cexil_dylib target_device_version=${{ env.target_device_version }}
       - name: make_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
-        run: cd clic3 && make clic3_dylib target_device_version=${{ env.target_device_version_macos }}
+        run: cd clic3 && make clic3_dylib target_device_version=${{ env.target_device_version }}
       - name: make_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
-        run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version_macos }}
+        run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version }}
       - name: make_interrupt_handler
         if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
-        run: cd interrupt_handler && make interrupt_handler_dylib target_device_version=${{ env.target_device_version_macos }}
+        run: cd interrupt_handler && make interrupt_handler_dylib target_device_version=${{ env.target_device_version }}
       - name: make_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        run: cd math_c && make math_c_dylib target_device_version=${{ env.target_device_version_macos }}
+        run: cd math_c && make math_c_dylib target_device_version=${{ env.target_device_version }}
       - name: make_metil
         if: steps.cache_restore_metil.outputs.cache-hit != 'true'
-        run: cd metil && make target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
+        run: cd metil && make target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: make_rand
         if: steps.cache_restore_rand.outputs.cache-hit != 'true'
-        run: cd rand && make rand_dylib target_device_version=${{ env.target_device_version_macos }}
+        run: cd rand && make rand_dylib target_device_version=${{ env.target_device_version }}
       - name: make_game_of_life_2d
-        run: cd game_of_life && make debug=0 rendering_mode=2d with_metal=0 target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
+        run: cd game_of_life && make debug=0 rendering_mode=2d with_metal=0 target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: make_game_of_life_clean
         run: cd game_of_life && make clean
       - name: make_game_of_life_2d_with_metal
-        run: cd game_of_life && make debug=0 rendering_mode=2d with_metal=1 target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
+        run: cd game_of_life && make debug=0 rendering_mode=2d with_metal=1 target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: make_game_of_life_clean
         run: cd game_of_life && make clean
       - name: make_game_of_life_3d
-        run: cd game_of_life && make debug=0 rendering_mode=3d with_metal=0 target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
+        run: cd game_of_life && make debug=0 rendering_mode=3d with_metal=0 target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: make_game_of_life_clean
         run: cd game_of_life && make clean
       - name: make_game_of_life_3d_with_metal
-        run: cd game_of_life && make debug=0 rendering_mode=3d with_metal=1 target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
+        run: cd game_of_life && make debug=0 rendering_mode=3d with_metal=1 target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: cache_save_cer0
         id: cache_save_cer0
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cer0 == '1' && steps.cache_restore_cer0.outputs.cache-hit != 'true' }}
