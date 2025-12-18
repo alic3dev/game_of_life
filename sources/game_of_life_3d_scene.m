@@ -10,11 +10,12 @@
 #include <clic3_bytes.h>
 #include <clic3_vector.h>
 
-#include <metil_audio/audio.h>
+#include <metil_audio/metil_audio_io_proc.h>
 #include <metil_debug/log.h>
 #include <metil_library.h>
 #include <metil_mesh/mesh_box.h>
 #include <metil_object.h>
+#include <metil_rendering/metil_renderer_interface.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_scenes/scene.h>
 
@@ -35,16 +36,13 @@
 
 void game_of_life_3d_scene_initialize(
   struct metil_scene* scene,
-  id<MTLDevice> metal_kit_device,
+  struct metil_renderer_interface* metil_renderer_interface,
   struct game_of_life_parameters* game_of_life_parameters
 ) {
   metil_scene_initialize(
     scene,
-    metal_kit_device
+    metil_renderer_interface
   );
-
-  scene->type = metil_scene_type_game;
-  scene->id = 0;
 
   scene->poll = game_of_life_3d_scene_poll;
   scene->destroy = game_of_life_3d_scene_destroy;
@@ -77,10 +75,12 @@ void game_of_life_3d_scene_initialize(
 
   #if with_metal == 1
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data = malloc(
-    sizeof(struct game_of_life_metal_acceleration_data)
+    sizeof(
+      struct game_of_life_metal_acceleration_data
+    )
   );
   
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->metal_device = scene->metal_device;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->metal_device = scene->renderer_interface->metal_device;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->library = metil_library.library;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->function_compute = (void*)0;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->pipeline_state_compute = (void*)0;
@@ -138,40 +138,44 @@ void game_of_life_3d_scene_initialize(
   );
   #endif
 
-  scene->length_objects = game_of_life_3d_scene_data->length_cells;
+  scene->length_renderables = game_of_life_3d_scene_data->length_cells;
 
-  scene->objects = realloc(
-    scene->objects,
-    sizeof(struct metil_object*) *
-    scene->length_objects
+  scene->renderables = realloc(
+    scene->renderables,
+    sizeof(struct metil_renderable) *
+    scene->length_renderables
   );
 
   for (
-    unsigned int index_object = 0;
-    index_object < scene->length_objects;
-    ++index_object
+    unsigned int index_renderable = 0;
+    index_renderable < scene->length_renderables;
+    ++index_renderable
   ) {
     unsigned int index_x = (
-      index_object % game_of_life_3d_scene_data->game_of_life_parameters->size.x
+      index_renderable % game_of_life_3d_scene_data->game_of_life_parameters->size.x
     );
 
     unsigned int index_y = (
-      index_object / game_of_life_3d_scene_data->game_of_life_parameters->size.x
+      index_renderable / game_of_life_3d_scene_data->game_of_life_parameters->size.x
     );
 
-    scene->objects[index_object] = malloc(
-      sizeof(struct metil_object)
+    metil_renderable_initialize_at_index(
+      scene->renderables,
+      index_renderable,
+      metil_renderable_type_object
     );
-    
-    metil_object_initialize(
-      scene->objects[index_object]
+
+    struct metil_object* metil_object = (
+      scene->renderables[
+        index_renderable
+      ].renderable
     );
 
     if (
-      index_object == 0
+      index_renderable == 0
     ) {
       metil_mesh_box_initialize(
-        &scene->objects[index_object]->mesh,
+        &metil_object->mesh,
         (struct clic3_vector3_float) {
           .x = 1,
           .y = 1,
@@ -179,91 +183,73 @@ void game_of_life_3d_scene_initialize(
         }
       );
 
-      scene->objects[index_object]->vertices = [metal_kit_device
+      metil_object->vertices = [
+        scene->renderer_interface->metal_device
         newBufferWithBytes: (
-          scene->objects[
-            index_object
-          ]->mesh.vertices
+          metil_object->mesh.vertices
         )
         length: (
           sizeof(struct clic3_vector4_float) *
-          scene->objects[
-            index_object
-          ]->mesh.length_vertices
+          metil_object->mesh.length_vertices
         )
         options: MTLResourceStorageModeShared
       ];
 
-      scene->objects[index_object]->indices = [metal_kit_device
+      metil_object->indices = [
+        scene->renderer_interface->metal_device
         newBufferWithBytes: (
-          scene->objects[
-            index_object
-          ]->mesh.indices
+          metil_object->mesh.indices
         )
         length: (
           sizeof(unsigned int) *
-          scene->objects[
-            index_object
-          ]->mesh.length_indices
+          metil_object->mesh.length_indices
         )
         options: MTLResourceStorageModeShared
       ];
     } else {
-      scene->objects[
-        index_object
-      ]->mesh = (
-        scene->objects[0]->mesh
+      metil_object->mesh = (
+        ((struct metil_object*) scene->renderables[0].renderable)->mesh
       );
 
-      scene->objects[
-        index_object
-      ]->vertices = (
-        scene->objects[0]->vertices
+      metil_object->vertices = (
+        ((struct metil_object*) scene->renderables[0].renderable)->vertices
       );
 
-      scene->objects[
-        index_object
-      ]->indices = (
-        scene->objects[0]->indices
+      metil_object->indices = (
+        ((struct metil_object*) scene->renderables[0].renderable)->indices
       );
     }
 
-    scene->objects[index_object]->data = [metal_kit_device
+    metil_object->data = [
+      scene->renderer_interface->metal_device
       newBufferWithLength: (
         sizeof(struct metil_renderer_data_object)
       )
       options: MTLResourceStorageModeShared
     ];
 
-    struct metil_renderer_data_object* data = scene->objects[
-      index_object
-    ]->data.contents;
-    data->id = index_object;
+    struct metil_renderer_data_object* data = (
+      metil_object->data.contents
+    );
 
     #if with_metal == 1
     if (
-      cells[index_object] == 1
+      cells[index_renderable] == 1
     ) {
-      scene->objects[
-        index_object
-      ]->position.z = 100.0f;
+      metil_object->position.z = 100.0f;
 
-      data->color.x = (float) living_neighbors[index_object] / 3.0f;
-      data->color.y = (float) living_neighbors[index_object] / 3.0f;
-      data->color.z = (float) living_neighbors[index_object] / 3.0f;
+      data->color.x = (float) living_neighbors[index_renderable] / 3.0f;
+      data->color.y = (float) living_neighbors[index_renderable] / 3.0f;
+      data->color.z = (float) living_neighbors[index_renderable] / 3.0f;
 
-      scene->objects[
-        index_object
-      ]->position.z = 100.0f;
+      metil_object->position.z = 100.0f;
     } else {
-      data->color.x = (float) living_neighbors[index_object] / 8.0f;
-      data->color.y = (float) living_neighbors[index_object] / 16.0f;
-      data->color.z = (float) living_neighbors[index_object] / 16.0f;
+      data->color.x = (float) living_neighbors[index_renderable] / 8.0f;
+      data->color.y = (float) living_neighbors[index_renderable] / 16.0f;
+      data->color.z = (float) living_neighbors[index_renderable] / 16.0f;
 
-      scene->objects[
-        index_object
-      ]->position.z = (
-        101.0f + 8.0f - living_neighbors[index_object]
+      metil_object->position.z = (
+        101.0f + 8.0f - living_neighbors[index_renderable]
       );
     }
     #else
@@ -271,7 +257,7 @@ void game_of_life_3d_scene_initialize(
     data->color.y = game_of_life_3d_scene_data->cells[index_y][index_x];
     data->color.z = game_of_life_3d_scene_data->cells[index_y][index_x];
 
-    scene->objects[index_object]->position.z = (
+    metil_object->position.z = (
       game_of_life_3d_scene_data->cells[index_y][index_x] == 1
       ? 100
       : 101.0f + 8.0f
@@ -279,12 +265,11 @@ void game_of_life_3d_scene_initialize(
     #endif
     data->color.w = 1.0f;
 
-    data->id = index_object;
-
-    scene->objects[index_object]->position.x = (
+    metil_object->position.x = (
       (float) index_x - (float) game_of_life_3d_scene_data->game_of_life_parameters->size.x / 2.0f
     );
-    scene->objects[index_object]->position.y = (
+
+    metil_object->position.y = (
       (float) index_y - (float) game_of_life_3d_scene_data->game_of_life_parameters->size.y / 2.0f
     );
   }
@@ -388,29 +373,31 @@ void game_of_life_3d_scene_poll(
   char* living_neighbors = game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->living_neighbors;
 
   for (
-    unsigned int index_object = 0;
-    index_object < scene->length_objects;
-    ++index_object
+    unsigned int index_renderable = 0;
+    index_renderable < scene->length_renderables;
+    ++index_renderable
   ) {
-    struct metil_renderer_data_object* data = scene->objects[
-      index_object
-    ]->data.contents;
+    struct metil_object* metil_object = (
+      scene->renderables[
+        index_renderable
+      ].renderable
+    );
+
+    struct metil_renderer_data_object* data = (
+      metil_object->data.contents
+    );
 
     if (
-      cells[index_object] == 1
+      cells[index_renderable] == 1
     ) {
-      scene->objects[
-        index_object
-      ]->position.z = 100.0f;
+      metil_object->position.z = 100.0f;
 
-      data->color.x = (float) living_neighbors[index_object] / 3.0f;
+      data->color.x = (float) living_neighbors[index_renderable] / 3.0f;
     } else {
-      data->color.x = (float) living_neighbors[index_object] / 16.0f;
+      data->color.x = (float) living_neighbors[index_renderable] / 16.0f;
 
-      scene->objects[
-        index_object
-      ]->position.z = (
-        101.0f + 8.0f - living_neighbors[index_object]
+      metil_object->position.z = (
+        101.0f + 8.0f - living_neighbors[index_renderable]
       );
     }
 
@@ -443,7 +430,13 @@ void game_of_life_3d_scene_poll(
       ) {
         unsigned int living_neighbors = 0;
 
-        const unsigned int index_object = offset_y + index_x;
+        const unsigned int index_renderable = offset_y + index_x;
+
+        struct metil_object* metil_object = (
+          scene->renderables[
+            index_renderable
+          ].renderable
+        );
         
         for (
           unsigned int index_neighbour_y = index_y == 0 ? 1 : index_y - 1;
@@ -473,9 +466,9 @@ void game_of_life_3d_scene_poll(
           }
         }
 
-        struct metil_renderer_data_object* data = scene->objects[
-          index_object
-        ]->data.contents;
+        struct metil_renderer_data_object* data = (
+          metil_object->data.contents
+        );
 
         if (
           (game_of_life_3d_scene_data->cells[index_y][index_x] == 1 && living_neighbors == 2) || 
@@ -483,9 +476,7 @@ void game_of_life_3d_scene_poll(
         ) {
           game_of_life_3d_scene_data->cells_next[index_y][index_x] = 1;
 
-          scene->objects[
-            index_object
-          ]->position.z = 100.0f;
+          metil_object->position.z = 100.0f;
 
           data->color.x = (float) living_neighbors / 3.0f;
           data->color.y = (float) living_neighbors / 3.0f;
@@ -497,9 +488,7 @@ void game_of_life_3d_scene_poll(
           data->color.y = (float) living_neighbors / 16.0f;
           data->color.z = (float) living_neighbors / 16.0f;
 
-          scene->objects[
-            index_object
-          ]->position.z = (
+          metil_object->position.z = (
             101.0f + 8.0f - living_neighbors
           );
         }
@@ -540,29 +529,34 @@ void game_of_life_3d_scene_destroy(
   }
   #endif
 
-  metil_mesh_destroy(&scene->objects[0]->mesh);
+  struct metil_object* metil_object = (
+    scene->renderables[
+      0
+    ].renderable
+  );
 
-  [scene->objects[0]->indices release];
-  [scene->objects[0]->vertices release];
+  metil_mesh_destroy(&metil_object->mesh);
 
-  for (
-    unsigned int index_object = 0;
-    index_object < scene->length_objects;
-    ++index_object
-  ) {
-    [scene->objects[index_object]->data release];
-  }
+  [metil_object->indices release];
+  [metil_object->vertices release];
 
   for (
-    unsigned int index_object = 0;
-    index_object < scene->length_objects;
-    ++index_object
+    unsigned int index_renderable = 0;
+    index_renderable < scene->length_renderables;
+    ++index_renderable
   ) {
+    metil_object = (
+      scene->renderables[
+        index_renderable
+      ].renderable
+    );
 
-    free(scene->objects[index_object]);
+    [metil_object->data release];
+
+    free(metil_object);
   }
 
-  free(scene->objects);
+  free(scene->renderables);
   free(scene->textures);
 
   scene->player.destroy(

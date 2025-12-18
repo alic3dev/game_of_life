@@ -16,8 +16,8 @@ ifndef target_device_version
 target_device_version=26.1
 endif
 
-ifndef target_standard_metal
-target_standard_metal=metal4.0
+ifndef target_metal_standard
+target_metal_standard=metal4.0
 endif
 
 target_platform=arm64-apple-macos${target_device_version}
@@ -112,7 +112,7 @@ version_target_cexil=0
 version_target_clic3=0
 version_target_interrupt_handler=0
 version_target_math_c=0
-version_target_metil=0
+version_target_metil=1
 version_target_rand=0
 
 file_clic3_library=${directory_clic3_library}/clic3.${version_target_clic3}.dylib
@@ -249,7 +249,7 @@ c_flags_output=${c_flags_platform} ${c_flags_frameworks}
 metal=xcrun -sdk macosx metal
 metal_ar=xcrun -sdk macosx metal-ar
 metallib=xcrun -sdk macosx metallib
-metal_flags_common=-target ${target_platform_metal} -std=${target_standard_metal}
+metal_flags_common=-target ${target_platform_metal} -std=${target_metal_standard}
 metal_flags=${metal_flags_common} -I${directory_include} -I${directory_clic3_include} -I${directory_metil_include} -isysroot ${directory_macos_sdk}
 
 ifneq (${disable_metal_fast_options}, 1)

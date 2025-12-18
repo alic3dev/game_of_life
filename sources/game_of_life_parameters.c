@@ -82,8 +82,8 @@ unsigned char game_of_life_parameters_parse(
       index_parameter_supplied != -1 &&
       index_parameter_supplied != 2 &&
       #if rendering_mode == 3
-      index_parameter_supplied != 3 &&
       index_parameter_supplied != 4 &&
+      index_parameter_supplied != 5 &&
       #endif
       (index_parameter + 1) >= length_parameters
     ) {
