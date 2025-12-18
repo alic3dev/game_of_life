@@ -6,6 +6,7 @@
 #endif
 #include <game_of_life_parameters.h>
 
+#include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/scene.h>
 
 #include <rand_result.h>
@@ -37,7 +38,7 @@ struct game_of_life_3d_scene_data {
 
 void game_of_life_3d_scene_initialize(
   struct metil_scene*,
-  id<MTLDevice>,
+  struct metil_renderer_interface*,
   struct game_of_life_parameters*
 );
 
