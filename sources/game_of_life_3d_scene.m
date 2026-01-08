@@ -8,16 +8,17 @@
 #endif
 
 #include <clic3_bytes.h>
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <metil_audio/metil_audio_io_proc.h>
-#include <metil_debug/log.h>
+#include <metil_audio/metil_audio_io_proc_data.h>
+#include <metil_debug/metil_debug_log.h>
 #include <metil_library.h>
-#include <metil_mesh/mesh_box.h>
+#include <metil_mesh/metil_mesh_box.h>
 #include <metil_object.h>
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_rendering/metil_renderer_data_object.h>
-#include <metil_scenes/scene.h>
+#include <metil_scenes/metil_scene.h>
 
 #include <rand_clean.h>
 #include <rand_functions.h>
@@ -35,13 +36,13 @@
 #include <stdlib.h>
 
 void game_of_life_3d_scene_initialize(
+  struct metil* metil,
   struct metil_scene* scene,
-  struct metil_renderer_interface* metil_renderer_interface,
   struct game_of_life_parameters* game_of_life_parameters
 ) {
   metil_scene_initialize(
-    scene,
-    metil_renderer_interface
+    metil,
+    scene
   );
 
   scene->poll = game_of_life_3d_scene_poll;
@@ -80,10 +81,10 @@ void game_of_life_3d_scene_initialize(
     )
   );
   
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->metal_device = scene->renderer_interface->metal_device;
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->library = metil_library.library;
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->function_compute = (void*)0;
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->pipeline_state_compute = (void*)0;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->metal_device = metil->renderer_interface.metal_device;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->library = metil->library.library;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->function_compute = (void*) 0;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->pipeline_state_compute = (void*) 0;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->error = game_of_life_metal_acceleration_data_error_none;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->rand_parameters = &game_of_life_3d_scene_data->rand_parameters;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->rand_result = &game_of_life_3d_scene_data->rand_result;
@@ -176,60 +177,60 @@ void game_of_life_3d_scene_initialize(
     ) {
       metil_mesh_box_initialize(
         &metil_object->mesh,
-        (struct clic3_vector3_float) {
+        (struct math_c_vector3_float) {
           .x = 1,
           .y = 1,
           .z = 1
         }
       );
 
-      metil_object->vertices = [
-        scene->renderer_interface->metal_device
-        newBufferWithBytes: (
-          metil_object->mesh.vertices
-        )
-        length: (
-          sizeof(struct clic3_vector4_float) *
-          metil_object->mesh.length_vertices
-        )
-        options: MTLResourceStorageModeShared
-      ];
-
-      metil_object->indices = [
-        scene->renderer_interface->metal_device
-        newBufferWithBytes: (
-          metil_object->mesh.indices
-        )
-        length: (
-          sizeof(unsigned int) *
-          metil_object->mesh.length_indices
-        )
-        options: MTLResourceStorageModeShared
-      ];
+      metil_object_buffers_initialize(
+        metil_object,
+        metil->renderer_interface.metal_device
+      );
     } else {
       metil_object->mesh = (
         ((struct metil_object*) scene->renderables[0].renderable)->mesh
       );
 
-      metil_object->vertices = (
-        ((struct metil_object*) scene->renderables[0].renderable)->vertices
+      metil_object_buffers_add(
+        metil_object,
+        metil->renderer_interface.metal_device,
+        metil_object_buffer_type_vertex
       );
+
+      metil_object_buffers_add(
+        metil_object,
+        metil->renderer_interface.metal_device,
+        metil_object_buffer_type_vertex
+      );
+
+      metil_object->buffers_vertex[
+        metil_object_buffer_default_index_vertices
+      ].buffer = (
+        ((struct metil_object*) scene->renderables[0].renderable)->buffers_vertex[
+          metil_object_buffer_default_index_vertices
+        ].buffer 
+      );
+
+      metil_object->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer = [metil->renderer_interface.metal_device
+        newBufferWithLength: sizeof(
+          struct metil_renderer_data_object
+        )
+        options: MTLResourceStorageModeShared
+      ];
 
       metil_object->indices = (
         ((struct metil_object*) scene->renderables[0].renderable)->indices
       );
     }
 
-    metil_object->data = [
-      scene->renderer_interface->metal_device
-      newBufferWithLength: (
-        sizeof(struct metil_renderer_data_object)
-      )
-      options: MTLResourceStorageModeShared
-    ];
-
     struct metil_renderer_data_object* data = (
-      metil_object->data.contents
+      metil_object->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
     );
 
     #if with_metal == 1
@@ -279,6 +280,7 @@ void game_of_life_3d_scene_initialize(
     game_of_life_3d_scene_data->game_of_life_parameters->audio == 1
   ) {
     metil_audio_io_proc_add_with_data(
+      &metil->audio,
       game_of_life_3d_scene_io_proc,
       game_of_life_3d_scene_data
     );
@@ -327,6 +329,7 @@ void game_of_life_generate_initial_generation(
 #endif
 
 void game_of_life_3d_scene_poll(
+  struct metil* metil,
   struct metil_scene* scene
 ) {
   struct game_of_life_3d_scene_data* game_of_life_3d_scene_data = (
@@ -384,7 +387,9 @@ void game_of_life_3d_scene_poll(
     );
 
     struct metil_renderer_data_object* data = (
-      metil_object->data.contents
+      metil_object->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
     );
 
     if (
@@ -467,7 +472,9 @@ void game_of_life_3d_scene_poll(
         }
 
         struct metil_renderer_data_object* data = (
-          metil_object->data.contents
+          metil_object->buffers_vertex[
+            metil_object_buffer_default_index_data
+          ].buffer.contents
         );
 
         if (
@@ -513,6 +520,7 @@ void game_of_life_3d_scene_poll(
 }
 
 void game_of_life_3d_scene_destroy(
+  struct metil* metil,
   struct metil_scene* scene
 ) {
   struct game_of_life_3d_scene_data* game_of_life_3d_scene_data = (
@@ -524,6 +532,7 @@ void game_of_life_3d_scene_destroy(
     game_of_life_3d_scene_data->game_of_life_parameters->audio == 1
   ) {
     metil_audio_io_proc_remove(
+      &metil->audio,
       game_of_life_3d_scene_io_proc
     );
   }
@@ -535,10 +544,18 @@ void game_of_life_3d_scene_destroy(
     ].renderable
   );
 
-  metil_mesh_destroy(&metil_object->mesh);
+  metil_mesh_destroy(
+    &metil_object->mesh
+  );
 
   [metil_object->indices release];
-  [metil_object->vertices release];
+
+  [
+    metil_object->buffers_vertex[
+      metil_object_buffer_default_index_vertices
+    ].buffer
+    release
+  ];
 
   for (
     unsigned int index_renderable = 0;
@@ -551,15 +568,38 @@ void game_of_life_3d_scene_destroy(
       ].renderable
     );
 
-    [metil_object->data release];
+    metil_object->mesh.vertices = (
+      (void*) 0
+    );
 
-    free(metil_object);
+    metil_object->mesh.indices = (
+      (void*) 0
+    );
+
+    [
+      metil_object->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer
+      release
+    ];
+
+    metil_object->length_buffers_vertex = 0;
+
+    metil_object->indices = (
+      (void*) 0
+    );
+
+    metil_object_destroy(
+      metil,
+      metil_object
+    );
   }
 
   free(scene->renderables);
   free(scene->textures);
 
   scene->player.destroy(
+    metil,
     &scene->player
   );
 
@@ -598,8 +638,12 @@ OSStatus game_of_life_3d_scene_io_proc(
   const AudioTimeStamp* time_stamp_audio_out,
   void* data
 ) {
+  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
+    data
+  );
+
   struct game_of_life_3d_scene_data* game_of_life_3d_scene_data = (
-    (struct game_of_life_3d_scene_data*) data
+    metil_audio_io_proc_data->data
   );
 
   #if with_metal == 1

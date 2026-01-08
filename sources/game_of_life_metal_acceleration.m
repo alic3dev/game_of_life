@@ -4,7 +4,7 @@
 #include <game_of_life_parameters.h>
 #include <game_of_life_cell_transform.h>
 
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <rand_functions.h>
 

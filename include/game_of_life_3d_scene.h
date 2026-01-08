@@ -6,8 +6,8 @@
 #endif
 #include <game_of_life_parameters.h>
 
-#include <metil_rendering/metil_renderer_interface.h>
-#include <metil_scenes/scene.h>
+#include <metil.h>
+#include <metil_scenes/metil_scene.h>
 
 #include <rand_result.h>
 #include <rand_source.h>
@@ -37,8 +37,8 @@ struct game_of_life_3d_scene_data {
 };
 
 void game_of_life_3d_scene_initialize(
+  struct metil*,
   struct metil_scene*,
-  struct metil_renderer_interface*,
   struct game_of_life_parameters*
 );
 
@@ -49,10 +49,12 @@ void game_of_life_generate_initial_generation(
 #endif
 
 void game_of_life_3d_scene_poll(
+  struct metil*,
   struct metil_scene*
 );
 
 void game_of_life_3d_scene_destroy(
+  struct metil*,
   struct metil_scene*
 );
 
