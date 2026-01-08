@@ -32,6 +32,13 @@ directory_output_base=output
 
 directory_objects=${directory_objects_base}/release
 
+ifndef directory_math_c
+directory_math_c=../math_c
+endif
+
+directory_math_c_include=${directory_math_c}/include
+directory_math_c_library=${directory_math_c}/library/macos/release
+
 ifndef rendering_mode
 rendering_mode=2d
 else
@@ -155,7 +162,7 @@ endif
 files_objects_c=${patsubst ${directory_sources}/%.c,${directory_objects_c}/%.o,${files_sources_c}}
 files_objects_objective_c=${patsubst ${directory_sources}/%.m,${directory_objects_objective_c}/%.o,${files_sources_objective_c}}
 
-c_flags_includes=-I${directory_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include} -I${directory_rand_include}
+c_flags_includes=-I${directory_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include} -I${directory_math_c_include} -I${directory_rand_include}
 
 ifeq (${rendering_mode},2d)
 file_output=${directory_output}/${name}
@@ -181,7 +188,7 @@ directory_app_contents_macos=${directory_app_contents}/MacOS
 directory_app_contents_resources=${directory_app_contents}/Resources
 directory_app_contents_resources_textures=${directory_app_contents_resources}/textures
 
-file_info_plist=${directory_metil}/Info.plist
+file_info_plist=${directory_metil_library}/Info.plist
 file_output=${directory_app_contents_macos}/${name}
 file_output_info_plist=${directory_app_contents}/Info.plist
 file_output_metal=${directory_app_contents_resources}/default.metallib
@@ -206,16 +213,11 @@ ifndef directory_cer0
 directory_cer0=../cer0
 endif
 
-ifndef directory_math_c
-directory_math_c=../math_c
-endif
-
 ifndef directory_metil
 directory_metil=../metil
 endif
 
 directory_cer0_include=${directory_cer0}/include
-directory_math_c_include=${directory_math_c}/include
 directory_metil_include=${directory_metil}/include
 
 ifeq (${debug}, 1)
@@ -227,7 +229,6 @@ file_metil_library=${directory_metil_library}/metil.${version_target_metil}.dyli
 endif
 
 directory_cer0_library=${directory_cer0}/library/macos/release
-directory_math_c_library=${directory_math_c}/library/macos/release
 
 file_metil_metallib=${directory_metil_library}/metil.metallib
 file_metil_storyboard=${directory_metil_library}/metil.storyboardc
@@ -250,7 +251,7 @@ metal=xcrun -sdk macosx metal
 metal_ar=xcrun -sdk macosx metal-ar
 metallib=xcrun -sdk macosx metallib
 metal_flags_common=-target ${target_platform_metal} -std=${target_metal_standard}
-metal_flags=${metal_flags_common} -I${directory_include} -I${directory_clic3_include} -I${directory_metil_include} -isysroot ${directory_macos_sdk}
+metal_flags=${metal_flags_common} -I${directory_include} -I${directory_math_c_include} -I${directory_metil_include} -isysroot ${directory_macos_sdk}
 
 ifneq (${disable_metal_fast_options}, 1)
 metal_flags:=${metal_flags} -fmetal-math-mode\=fast -fmetal-math-fp32-functions\=fast

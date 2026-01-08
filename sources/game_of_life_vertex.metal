@@ -7,8 +7,8 @@
 #include <metal_stdlib>
 
 vertex game_of_life_data_vertex game_of_life_3d_vertex(
-  const device simd_float4* positions [[buffer(
-    metil_renderer_vertex_index_parameter_positions
+  const device simd_float4* vertices [[buffer(
+    metil_renderer_vertex_index_parameter_vertices
   )]],
   constant struct metil_renderer_data_frame& data_frame [[buffer(
     metil_renderer_vertex_index_parameter_data_frame
@@ -22,7 +22,9 @@ vertex game_of_life_data_vertex game_of_life_3d_vertex(
 
   game_of_life_data_vertex.position = (
     data_object.view_model_matrix_projection *
-    positions[id_vertex]
+    vertices[
+      id_vertex
+    ]
   );
 
   game_of_life_data_vertex.brightness = (
