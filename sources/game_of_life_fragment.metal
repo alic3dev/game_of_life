@@ -14,9 +14,9 @@ fragment float4 game_of_life_3d_fragment(
           ),
           1.0f
         )
-      )
+      ) *
+      game_of_life_data_vertex.color.x
     ) * (
-      game_of_life_data_vertex.color.x * 
       game_of_life_data_vertex.brightness
     ),
     metal::fmax(
@@ -28,9 +28,9 @@ fragment float4 game_of_life_3d_fragment(
           ),
           1.0f
         )
-      )
+      ) *
+      game_of_life_data_vertex.color.y
     ) * (
-      game_of_life_data_vertex.color.y *
       game_of_life_data_vertex.brightness
     ),
     metal::fmax(
@@ -42,9 +42,9 @@ fragment float4 game_of_life_3d_fragment(
           ), 
           1.0f
         )
-      )
+      ) *
+      game_of_life_data_vertex.color.z
     ) * (
-      game_of_life_data_vertex.color.z *
       game_of_life_data_vertex.brightness
     ),
     game_of_life_data_vertex.color.w

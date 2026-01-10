@@ -315,6 +315,23 @@ void game_of_life_generate_initial_generation(
   struct rand_result* rand_result,
   struct rand_source* rand_source
 ) {
+  rand_clean(
+    rand_result,
+    rand_source
+  );
+
+  rand_initialize(
+    rand_parameters,
+    rand_result,
+    rand_source,
+    (
+      game_of_life_parameters->size.y *
+      game_of_life_parameters->size.x
+    ),
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
   rand_get(
     rand_source,
     rand_result,
