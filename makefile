@@ -181,6 +181,21 @@ files_libraries:=${files_libraries} ${file_library_cexil}
 c_flags_includes:=${c_flags_includes} -I${directory_cexil_include}
 endif
 
+ifndef directory_metil
+directory_metil=../metil
+endif
+
+directory_metil_include=${directory_metil}/include
+directory_metil_library=${directory_metil}/library/macos
+
+ifeq (${debug}, 1)
+directory_metil_library:=${directory_metil_library}/debug
+file_metil_library=${directory_metil_library}/metil_debug.o
+else
+directory_metil_library:=${directory_metil_library}/release
+file_metil_library=${directory_metil_library}/metil.${version_target_metil}.dylib
+endif
+
 ifeq (${rendering_mode},3d)
 directory_app=${directory_output}/${name}.app
 directory_app_contents=${directory_app}/Contents
@@ -213,20 +228,7 @@ ifndef directory_cer0
 directory_cer0=../cer0
 endif
 
-ifndef directory_metil
-directory_metil=../metil
-endif
-
 directory_cer0_include=${directory_cer0}/include
-directory_metil_include=${directory_metil}/include
-
-ifeq (${debug}, 1)
-directory_metil_library=${directory_metil}/library_debug
-file_metil_library=${directory_metil_library}/metil_debug.o
-else
-directory_metil_library=${directory_metil}/library
-file_metil_library=${directory_metil_library}/metil.${version_target_metil}.dylib
-endif
 
 directory_cer0_library=${directory_cer0}/library/macos/release
 
