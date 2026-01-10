@@ -21,8 +21,8 @@
 #include <metil_scenes/metil_scene.h>
 
 #include <rand_clean.h>
-#include <rand_functions.h>
 #include <rand_initialize.h>
+#include <rand_functions.h>
 #include <rand_mode.h>
 #include <rand_parameters.h>
 #include <rand_result.h>
@@ -239,24 +239,13 @@ void game_of_life_3d_scene_initialize(
     ) {
       metil_object->position.z = 100.0f;
 
-      data->color.x = (float) living_neighbors[index_renderable] / 3.0f;
-      data->color.y = (float) living_neighbors[index_renderable] / 3.0f;
-      data->color.z = (float) living_neighbors[index_renderable] / 3.0f;
-
       metil_object->position.z = 100.0f;
     } else {
-      data->color.x = (float) living_neighbors[index_renderable] / 8.0f;
-      data->color.y = (float) living_neighbors[index_renderable] / 16.0f;
-      data->color.z = (float) living_neighbors[index_renderable] / 16.0f;
-
       metil_object->position.z = (
         101.0f + 8.0f - living_neighbors[index_renderable]
       );
     }
     #else
-    data->color.x = game_of_life_3d_scene_data->cells[index_y][index_x];
-    data->color.y = game_of_life_3d_scene_data->cells[index_y][index_x];
-    data->color.z = game_of_life_3d_scene_data->cells[index_y][index_x];
 
     metil_object->position.z = (
       game_of_life_3d_scene_data->cells[index_y][index_x] == 1
@@ -264,7 +253,6 @@ void game_of_life_3d_scene_initialize(
       : 101.0f + 8.0f
     );
     #endif
-    data->color.w = 1.0f;
 
     metil_object->position.x = (
       (float) index_x - (float) game_of_life_3d_scene_data->game_of_life_parameters->size.x / 2.0f
@@ -292,6 +280,23 @@ void game_of_life_3d_scene_initialize(
 void game_of_life_generate_initial_generation(
   struct game_of_life_3d_scene_data* game_of_life_3d_scene_data
 ) {
+  rand_clean(
+    &game_of_life_3d_scene_data->rand_result,
+    &game_of_life_3d_scene_data->rand_source
+  );
+
+  rand_initialize(
+    &game_of_life_3d_scene_data->rand_parameters,
+    &game_of_life_3d_scene_data->rand_result,
+    &game_of_life_3d_scene_data->rand_source,
+    (
+      game_of_life_3d_scene_data->game_of_life_parameters->size.y *
+      game_of_life_3d_scene_data->game_of_life_parameters->size.x
+    ),
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
   rand_get(
     &game_of_life_3d_scene_data->rand_source,
     &game_of_life_3d_scene_data->rand_result,
@@ -366,6 +371,72 @@ void game_of_life_3d_scene_poll(
     #endif
   }
 
+  if (
+    game_of_life_parameters->lock_to_generation == 1
+  ) {
+    #if with_metal == 1
+    char* cells = game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->cells;
+    char* living_neighbors = game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->living_neighbors;
+    #endif
+
+    for (
+      unsigned int index_renderable = 0;
+      index_renderable < scene->length_renderables;
+      ++index_renderable
+    ) {
+      unsigned int index_x = (
+        index_renderable % game_of_life_3d_scene_data->game_of_life_parameters->size.x
+      );
+
+      unsigned int index_y = (
+        index_renderable / game_of_life_3d_scene_data->game_of_life_parameters->size.x
+      );
+
+      struct metil_object* metil_object = (
+        scene->renderables[
+          index_renderable
+        ].renderable
+      );
+
+      struct metil_renderer_data_object* data = (
+        metil_object->buffers_vertex[
+          metil_object_buffer_default_index_data
+        ].buffer.contents
+      );
+
+      #if with_metal == 1
+      if (
+        cells[index_renderable] == 1
+      ) {
+        metil_object->position.z = 100.0f;
+
+        metil_object->position.z = 100.0f;
+      } else {
+        metil_object->position.z = (
+          101.0f + 8.0f - living_neighbors[index_renderable]
+        );
+      }
+      #else
+
+      metil_object->position.z = (
+        game_of_life_3d_scene_data->cells[index_y][index_x] == 1
+        ? 100
+        : 101.0f + 8.0f
+      );
+      #endif
+
+      metil_object->position.x = (
+        (float) index_x - (float) game_of_life_3d_scene_data->game_of_life_parameters->size.x / 2.0f
+      );
+
+      metil_object->position.y = (
+        (float) index_y - (float) game_of_life_3d_scene_data->game_of_life_parameters->size.y / 2.0f
+      );
+    }
+
+    return;
+  }
+
   #if with_metal == 1
   game_of_life_metal_acceleration_compute(
     game_of_life_3d_scene_data->game_of_life_metal_acceleration_data,
@@ -396,18 +467,13 @@ void game_of_life_3d_scene_poll(
       cells[index_renderable] == 1
     ) {
       metil_object->position.z = 100.0f;
-
-      data->color.x = (float) living_neighbors[index_renderable] / 3.0f;
     } else {
-      data->color.x = (float) living_neighbors[index_renderable] / 16.0f;
-
       metil_object->position.z = (
-        101.0f + 8.0f - living_neighbors[index_renderable]
+        101.0f + 8.0f - living_neighbors[
+          index_renderable
+        ]
       );
     }
-
-    data->color.y = data->color.x;
-    data->color.z = data->color.x;
   }
   #else
   unsigned int count_generations = (
@@ -484,16 +550,8 @@ void game_of_life_3d_scene_poll(
           game_of_life_3d_scene_data->cells_next[index_y][index_x] = 1;
 
           metil_object->position.z = 100.0f;
-
-          data->color.x = (float) living_neighbors / 3.0f;
-          data->color.y = (float) living_neighbors / 3.0f;
-          data->color.z = (float) living_neighbors / 3.0f;
         } else {
           game_of_life_3d_scene_data->cells_next[index_y][index_x] = 0;
-
-          data->color.x = (float) living_neighbors / 8.0f;
-          data->color.y = (float) living_neighbors / 16.0f;
-          data->color.z = (float) living_neighbors / 16.0f;
 
           metil_object->position.z = (
             101.0f + 8.0f - living_neighbors

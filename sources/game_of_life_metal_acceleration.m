@@ -6,7 +6,9 @@
 
 #include <math_c_vector.h>
 
+#include <rand_clean.h>
 #include <rand_functions.h>
+#include <rand_initialize.h>
 
 #include <Metal/MTLBuffer.h>
 #include <Metal/MTLCommandBuffer.h>
@@ -140,7 +142,10 @@ void game_of_life_metal_acceleration_initialize(
   unsigned long int size[3] = {
     game_of_life_parameters->size.x,
     game_of_life_parameters->size.y,
-    game_of_life_parameters->size.x * game_of_life_parameters->size.y
+    (
+      game_of_life_parameters->size.x *
+      game_of_life_parameters->size.y
+    )
   };
 
   game_of_life_metal_acceleration_data->buffer_size = [
@@ -178,6 +183,24 @@ void game_of_life_metal_acceleration_initialize(
 void game_of_life_generate_initial_generation(
   struct game_of_life_metal_acceleration_data* game_of_life_metal_acceleration_data
 ) {
+  unsigned long int* size = (
+    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_size
+  ).contents;
+
+  rand_clean(
+    game_of_life_metal_acceleration_data->rand_result,
+    game_of_life_metal_acceleration_data->rand_source
+  );
+
+  rand_initialize(
+    game_of_life_metal_acceleration_data->rand_parameters,
+    game_of_life_metal_acceleration_data->rand_result,
+    game_of_life_metal_acceleration_data->rand_source,
+    size[2],
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
   rand_get(
     game_of_life_metal_acceleration_data->rand_source,
     game_of_life_metal_acceleration_data->rand_result,
@@ -192,10 +215,6 @@ void game_of_life_generate_initial_generation(
     (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_living_neighbors
   ).contents;
 
-  unsigned long int* size = (
-    (id<MTLBuffer>) game_of_life_metal_acceleration_data->buffer_size
-  ).contents;
-
   for (
     unsigned int index_cell = 0;
     index_cell < game_of_life_metal_acceleration_data->rand_result->length;
@@ -208,6 +227,10 @@ void game_of_life_generate_initial_generation(
         index_cell
       ]
     );
+
+    living_neighbors[
+      index_cell
+    ] = 0;
   }
 
   for (
