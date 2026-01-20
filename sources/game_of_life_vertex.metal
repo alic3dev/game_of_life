@@ -35,7 +35,7 @@ vertex game_of_life_data_vertex game_of_life_3d_vertex(
     0.3f
   );
 
-  game_of_life_data_vertex.rotation_color = (
+  game_of_life_data_vertex.rotation_colour = (
     metal::fmod(
       (
         (
@@ -57,14 +57,14 @@ vertex game_of_life_data_vertex game_of_life_3d_vertex(
     / 10.0f
   );
 
-  game_of_life_data_vertex.color.r = (
+  game_of_life_data_vertex.colour.r = (
     metal::fmod(
       data_object.position.x,
       1.0f
     )
   );
 
-  game_of_life_data_vertex.color.g = (
+  game_of_life_data_vertex.colour.g = (
     metal::fmod(
       metal::fabs(
         data_frame.frame +
@@ -75,7 +75,7 @@ vertex game_of_life_data_vertex game_of_life_3d_vertex(
     ) / 100.0f
   );
 
-  game_of_life_data_vertex.color.b = (
+  game_of_life_data_vertex.colour.b = (
     metal::fmod(
       (
         data_object.position.x *
@@ -85,7 +85,7 @@ vertex game_of_life_data_vertex game_of_life_3d_vertex(
     )
   );
 
-  game_of_life_data_vertex.color.a = (
+  game_of_life_data_vertex.colour.a = (
     1.0f -
     (
       (

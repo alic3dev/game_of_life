@@ -3,6 +3,6 @@
 struct game_of_life_data_vertex {
   float4 position [[position]];
   float brightness;
-  float4 color;
-  float rotation_color;
+  float4 colour;
+  float rotation_colour;
 };
