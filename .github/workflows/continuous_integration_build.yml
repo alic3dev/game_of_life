@@ -123,21 +123,21 @@ jobs:
         with:
           repository: alic3dev/rand
           path: rand
-      - name: make_cexil
-        if: steps.cache_restore_cexil.outputs.cache-hit != 'true'
-        run: cd cexil && make cexil_dylib target_device_version=${{ env.target_device_version }}
       - name: make_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
-        run: cd clic3 && make clic3_dylib target_device_version=${{ env.target_device_version }}
-      - name: make_cer0
-        if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
-        run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version }}
+        run: cd clic3 && make clic3_dylib clic3_object target_device_version=${{ env.target_device_version }}
       - name: make_interrupt_handler
         if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
         run: cd interrupt_handler && make interrupt_handler_dylib target_device_version=${{ env.target_device_version }}
       - name: make_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        run: cd math_c && make math_c_dylib target_device_version=${{ env.target_device_version }}
+        run: cd math_c && make math_c_dylib math_c_object target_device_version=${{ env.target_device_version }}
+      - name: make_cer0
+        if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
+        run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version }}
+      - name: make_cexil
+        if: steps.cache_restore_cexil.outputs.cache-hit != 'true'
+        run: cd cexil && make cexil_dylib target_device_version=${{ env.target_device_version }}
       - name: make_metil
         if: steps.cache_restore_metil.outputs.cache-hit != 'true'
         run: cd metil && make target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
