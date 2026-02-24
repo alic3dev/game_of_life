@@ -119,7 +119,7 @@ version_target_cexil=0
 version_target_clic3=0
 version_target_interrupt_handler=0
 version_target_math_c=0
-version_target_metil=1
+version_target_metil=2
 version_target_rand=0
 
 file_clic3_library=${directory_clic3_library}/clic3.${version_target_clic3}.dylib
@@ -222,6 +222,8 @@ ifeq (${rendering_mode},3d)
 uses_metal=1
 endif
 
+cc=clang
+
 ifeq (${uses_metal},1)
 
 ifndef directory_cer0
@@ -238,8 +240,6 @@ file_cer0_library=${directory_cer0_library}/cer0.${version_target_cer0}.dylib
 file_math_c_library=${directory_math_c_library}/math_c.${version_target_math_c}.dylib
 
 files_libraries:=${files_libraries} ${file_cer0_library} ${file_math_c_library} ${file_metil_library}
-
-cc=clang
 
 frameworks=Metal MetalKit GameController CoreAudio CoreGraphics CoreText
 
@@ -260,13 +260,10 @@ metal_flags:=${metal_flags} -fmetal-math-mode\=fast -fmetal-math-fp32-functions\
 endif
 
 metal_flags_output=
-else
-cc=clang
-c_flags_output=${c_flags_platform}
 endif
 
 c_flags_debug_objective_c=-O0 -g -v
-c_flags_debug=${c_flags_debug_objective_c} -da -Q
+c_flags_debug=${c_flags_debug_objective_c}
 
 c_flags_c:=${c_flags_c} ${c_flags_includes}
 
@@ -282,12 +279,7 @@ ifeq (${debug}, 1)
 c_flags_c:=${c_flags_c} ${c_flags_debug}
 c_flags_objective_c:=${c_flags_objective_c} ${c_flags_debug_objective_c}
 
-ifeq (${cc},gcc)
-c_flags_output:=${c_flags_output} ${c_flags_debug}
-else
 c_flags_output:=${c_flags_output} ${c_flags_debug_objective_c}
-endif
-
 else
 c_flags_c:=${c_flags_c} -O3
 c_flags_objective_c:=${c_flags_objective_c} -O3

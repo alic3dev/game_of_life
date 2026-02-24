@@ -6,6 +6,8 @@
 
 #include <clic3.h>
 
+#include <math_c_vector.h>
+
 #include <stdio.h>
 
 const char message_parameter_already_set[] = "parameter->{%s}.already_set\n";
@@ -19,14 +21,14 @@ unsigned char game_of_life_parameters_parse(
   game_of_life_parameters->help = 0;
 
   #if rendering_mode == 2
-  struct cexil_size size_renderer;
+  struct math_c_vector2_unsigned_int size_renderer;
 
   cexil_size_set_to_terminal(
     &size_renderer
   );
 
-  game_of_life_parameters->size.x = size_renderer.width;
-  game_of_life_parameters->size.y = size_renderer.height;
+  game_of_life_parameters->size.x = size_renderer.x;
+  game_of_life_parameters->size.y = size_renderer.y;
   #else
   game_of_life_parameters->size.x = 300;
   game_of_life_parameters->size.y = 200;

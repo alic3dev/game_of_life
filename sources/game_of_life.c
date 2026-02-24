@@ -117,9 +117,9 @@ int main(
   interrupt_handler_initialize();
 
   struct cexil_renderer renderer;
-  struct cexil_size size_renderer = {
-    .width = game_of_life_parameters.size.x,
-    .height = game_of_life_parameters.size.y
+  struct math_c_vector2_unsigned_int size_renderer = {
+    .x = game_of_life_parameters.size.x,
+    .y = game_of_life_parameters.size.y
   };
 
   cexil_renderer_initialize(
