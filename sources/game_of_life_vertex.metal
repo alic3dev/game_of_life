@@ -44,12 +44,12 @@ vertex game_of_life_data_vertex game_of_life_3d_vertex(
             1.0f
           ) *
           metal::fabs(
-            data_object.position.y + 
+            data_object.position.y +
             1.0f
           ) *
           (float) data_frame.frame /
           10.0f
-        ) + 
+        ) +
         200.0f
       ),
       100.0f

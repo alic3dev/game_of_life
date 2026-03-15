@@ -80,7 +80,7 @@ void game_of_life_3d_scene_initialize(
       struct game_of_life_metal_acceleration_data
     )
   );
-  
+
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->metal_device = metil->renderer_interface.metal_device;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->library = metil->library.library;
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->function_compute = (void*) 0;
@@ -210,7 +210,7 @@ void game_of_life_3d_scene_initialize(
       ].buffer = (
         ((struct metil_object*) scene->renderables[0].renderable)->buffers_vertex[
           metil_object_buffer_default_index_vertices
-        ].buffer 
+        ].buffer
       );
 
       metil_object->buffers_vertex[
@@ -302,7 +302,7 @@ void game_of_life_generate_initial_generation(
     &game_of_life_3d_scene_data->rand_result,
     &game_of_life_3d_scene_data->rand_parameters
   );
-  
+
   for (
     unsigned int index_y = 0;
     index_y < game_of_life_3d_scene_data->game_of_life_parameters->size.y;
@@ -486,7 +486,7 @@ void game_of_life_3d_scene_poll(
     unsigned int index_generated_generation = 0;
     index_generated_generation < count_generations;
     ++index_generated_generation
-  ) { 
+  ) {
     for (
       unsigned int index_y = 0;
       index_y < game_of_life_parameters->size.y;
@@ -508,7 +508,7 @@ void game_of_life_3d_scene_poll(
             index_renderable
           ].renderable
         );
-        
+
         for (
           unsigned int index_neighbour_y = index_y == 0 ? 1 : index_y - 1;
           index_neighbour_y < index_y + 2;
@@ -544,7 +544,7 @@ void game_of_life_3d_scene_poll(
         );
 
         if (
-          (game_of_life_3d_scene_data->cells[index_y][index_x] == 1 && living_neighbors == 2) || 
+          (game_of_life_3d_scene_data->cells[index_y][index_x] == 1 && living_neighbors == 2) ||
           living_neighbors == 3
         ) {
           game_of_life_3d_scene_data->cells_next[index_y][index_x] = 1;
@@ -720,7 +720,7 @@ OSStatus game_of_life_3d_scene_io_proc(
     float* buffer_out = audio_buffer_current.mData;
     unsigned long int size_buffer_out = audio_buffer_current.mDataByteSize / sizeof(float);
     unsigned long int count_channel_out = audio_buffer_current.mNumberChannels;
-    
+
     for (
       unsigned long int index_buffer_out = 0;
       index_buffer_out < size_buffer_out;
