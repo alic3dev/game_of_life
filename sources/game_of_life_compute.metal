@@ -9,7 +9,7 @@ kernel void game_of_life_compute(
   unsigned long int index_y = index / size[0];
 
   unsigned char living_neighbors = 0;
-  
+
   for (
     unsigned int index_neighbour_y = index_y == 0 ? 1 : index_y - 1;
     index_neighbour_y < index_y + 2;
@@ -42,7 +42,7 @@ kernel void game_of_life_compute(
   }
 
   if (
-    (cells[index] == 1 && living_neighbors == 2) || 
+    (cells[index] == 1 && living_neighbors == 2) ||
     living_neighbors == 3
   ) {
     cells_next[index] = 1;

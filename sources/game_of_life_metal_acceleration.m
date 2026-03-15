@@ -63,7 +63,7 @@ void game_of_life_metal_acceleration_initialize(
     game_of_life_metal_acceleration_data->function_compute == (void*)0
   ) {
     game_of_life_metal_acceleration_data->function_compute = [
-      (id<MTLLibrary>) game_of_life_metal_acceleration_data->library 
+      (id<MTLLibrary>) game_of_life_metal_acceleration_data->library
       newFunctionWithName: @"game_of_life_compute"
     ];
 

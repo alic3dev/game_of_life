@@ -39,7 +39,7 @@ fragment float4 game_of_life_3d_fragment(
           metal::fabs(
             game_of_life_data_vertex.rotation_colour -
             10.0f
-          ), 
+          ),
           1.0f
         )
       ) *
