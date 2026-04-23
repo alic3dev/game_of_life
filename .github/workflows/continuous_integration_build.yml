@@ -11,7 +11,7 @@ env:
   enabled_caching_clic3: 1
   enabled_caching_interrupt_handler: 1
   enabled_caching_math_c: 1
-  enabled_caching_metil: 0
+  enabled_caching_metil: 1
   enabled_caching_rand: 1
   key_cache_cer0: cache_cer0_0_0_0
   key_cache_cexil: cache_cexil_0_0_0
