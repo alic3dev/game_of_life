@@ -18,7 +18,7 @@ env:
   key_cache_clic3: cache_clic3_0_0_0
   key_cache_interrupt_handler: cache_interrupt_handler_0_0_0
   key_cache_math_c: cache_math_c_0_0_0
-  key_cache_metil: cache_metil_0_0_0
+  key_cache_metil: cache_metil_3_0_0
   key_cache_rand: cache_rand_0_0_0
   target_device_version: 15.5
   target_metal_standard: metal3.2
