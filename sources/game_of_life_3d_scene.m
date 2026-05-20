@@ -35,8 +35,6 @@
 #import <AppKit/NSApplication.h>
 #endif
 
-#include <stdlib.h>
-
 void game_of_life_3d_scene_initialize(
   struct metil* metil,
   struct metil_scene* scene,
