@@ -244,10 +244,9 @@ files_libraries:=${files_libraries} ${file_cer0_library} ${file_math_c_library} 
 frameworks=Metal MetalKit GameController CoreAudio CoreGraphics CoreText
 
 c_flags_includes:=${c_flags_includes} -I${directory_metil_include} -I${directory_cer0_include} -I${directory_math_c_include}
-c_flags_c:=${c_flags_c} ${c_flags_platform}
-c_flags_objective_c=${c_flags_platform} ${c_flags_includes} -x objective-c -fmodules -fconstant-cfstrings -DTARGET_MACOS
+c_flags_objective_c=${c_flags_includes} -x objective-c -fmodules -fconstant-cfstrings -DTARGET_MACOS
 c_flags_frameworks=${addprefix -framework ,${frameworks}}
-c_flags_output=${c_flags_platform} ${c_flags_frameworks}
+c_flags_output=${c_flags_frameworks}
 
 metal=xcrun -sdk macosx metal
 metal_ar=xcrun -sdk macosx metal-ar
@@ -265,7 +264,9 @@ endif
 c_flags_debug_objective_c=-O0 -g -v
 c_flags_debug=${c_flags_debug_objective_c}
 
-c_flags_c:=${c_flags_c} ${c_flags_includes}
+c_flags_c:=${c_flags_c} ${c_flags_platform} ${c_flags_includes}
+c_flags_objective_c:=${c_flags_objective_c} ${c_flags_platform}
+c_flags_output:=${c_flags_output} ${c_flags_platform}
 
 ifeq (${rendering_mode},2d)
 c_flags_c:=${c_flags_c} -Drendering_mode=2
