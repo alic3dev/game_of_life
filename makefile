@@ -38,6 +38,7 @@ endif
 
 directory_math_c_include=${directory_math_c}/include
 directory_math_c_library=${directory_math_c}/library/macos/release
+directory_math_c_metalar=${directory_math_c}/metalar/macos
 
 ifndef rendering_mode
 rendering_mode=2d
@@ -220,6 +221,8 @@ endif
 
 ifeq (${rendering_mode},3d)
 uses_metal=1
+
+files_math_c_metalar=${directory_math_c_metalar}/math_c_absolute.metalar ${directory_math_c_metalar}/math_c_maximum.metalar ${directory_math_c_metalar}/math_c_modulus.metalar
 endif
 
 cc=clang
@@ -358,7 +361,7 @@ ${file_metalar}: ${directory_air}/game_of_life_compute.air
 else
 ${file_output_metal}: ${file_metalar}
 	mkdir -p ${dir ${file_output_metal}}
-	${metallib} ${metal_flags_output} ${file_metalar} ${file_metil_metalar_fps_display} -o ${file_output_metal}
+	${metallib} ${metal_flags_output} ${file_metalar} ${files_math_c_metalar} ${file_metil_metalar_fps_display} -o ${file_output_metal}
 
 ${file_metalar}: ${files_air}
 	mkdir -p ${directory_metalar}
