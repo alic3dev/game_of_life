@@ -4,8 +4,14 @@ unsigned char game_of_life_cell_transform(
   unsigned char cell
 ) {
   return (
-    (cell % 10) < 8
-    ? 0
-    : 1
+    (
+      (
+        cell %
+        0x0a
+      ) <
+      0x08
+    )
+    ? 0x00
+    : 0x01
   );
 }
