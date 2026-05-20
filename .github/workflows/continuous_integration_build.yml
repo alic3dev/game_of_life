@@ -35,49 +35,49 @@ jobs:
       - name: cache_restore_cer0
         id: cache_restore_cer0
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cer0 == '1' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: cer0
           key: ${{ env.key_cache_cer0 }}
       - name: cache_restore_cexil
         id: cache_restore_cexil
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cexil == '1' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: cexil
           key: ${{ env.key_cache_cexil }}
       - name: cache_restore_clic3
         id: cache_restore_clic3
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_clic3 == '1' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: clic3
           key: ${{ env.key_cache_clic3 }}
       - name: cache_restore_interrupt_handler
         id: cache_restore_interrupt_handler
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_interrupt_handler == '1' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: interrupt_handler
           key: ${{ env.key_cache_interrupt_handler }}
       - name: cache_restore_math_c
         id: cache_restore_math_c
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_math_c == '1' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: math_c
           key: ${{ env.key_cache_math_c }}
       - name: cache_restore_metil
         id: cache_restore_metil
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_metil == '1' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: metil
           key: ${{ env.key_cache_metil }}
       - name: cache_restore_rand
         id: cache_restore_rand
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_rand == '1' }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: rand
           key: ${{ env.key_cache_rand }}
@@ -161,49 +161,49 @@ jobs:
       - name: cache_save_cer0
         id: cache_save_cer0
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cer0 == '1' && steps.cache_restore_cer0.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: cer0
           key: ${{ env.key_cache_cer0 }}
       - name: cache_save_cexil
         id: cache_save_cexil
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cexil == '1' && steps.cache_restore_cexil.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: cexil
           key: ${{ env.key_cache_cexil }}
       - name: cache_save_clic3
         id: cache_save_clic3
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_clic3 == '1' && steps.cache_restore_clic3.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: clic3
           key: ${{ env.key_cache_clic3 }}
       - name: cache_save_interrupt_handler
         id: cache_save_interrupt_handler
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_interrupt_handler == '1' && steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: interrupt_handler
           key: ${{ env.key_cache_interrupt_handler }}
       - name: cache_save_math_c
         id: cache_save_math_c
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_math_c == '1' && steps.cache_restore_math_c.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: math_c
           key: ${{ env.key_cache_math_c }}
       - name: cache_save_metil
         id: cache_save_metil
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_metil == '1' && steps.cache_restore_metil.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: metil
           key: ${{ env.key_cache_metil }}
       - name: cache_save_rand
         id: cache_save_rand
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_rand == '1' && steps.cache_restore_rand.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: rand
           key: ${{ env.key_cache_rand }}
