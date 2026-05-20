@@ -1,81 +1,110 @@
 #include <game_of_life_print_usage.h>
 
+#include <clic3_memory.h>
+
 #include <stdio.h>
-#include <stdlib.h>
 
 void game_of_life_print_usage(
   const char* name,
   unsigned char to_error_stream
 ) {
   FILE* stream_output = (
-    to_error_stream
+    (
+      to_error_stream !=
+      0x00
+    )
     ? stderr
     : stdout
   );
 
   char* basename = (
-    (void*)0
+    0x00
   );
 
-  unsigned int length_basename = 0;
-  unsigned int index_basename = 0;
+  unsigned int length_basename = (
+    0x00
+  );
+  
+  unsigned int index_basename = (
+    0x00
+  );
 
   while (
     name[
       length_basename
-    ] != '\0'
+    ] !=
+    '\0'
   ) {
     length_basename = (
-      length_basename + 1
+      length_basename +
+      0x01
     );
   }
 
-  index_basename = length_basename;
+  index_basename = (
+    length_basename
+  );
 
   while (
-    name[
-      index_basename
-    ] != '/' &&
-    index_basename != 0
+    (
+      name[
+        index_basename
+      ] !=
+      '/'
+    ) &&
+    (
+      index_basename !=
+      0x00
+    )
   ) {
     index_basename = (
-      index_basename - 1
+      index_basename -
+      0x01
     );
   }
 
   if (
     name[
       index_basename
-    ] == '/'
+    ] ==
+    '/'
   ) {
     index_basename = (
       index_basename +
-      1
+      0x01
     );
   }
 
   length_basename = (
     length_basename -
     index_basename +
-    1
+    0x01
   );
 
-  basename = malloc(
-    sizeof(char) *
-    length_basename
+  basename = (
+    clic3_memory_allocate_raw(
+      length_basename
+    )
   );
 
   for (
-    unsigned int index_character_basename = 0;
-    index_character_basename < length_basename;
+    unsigned int index_character_basename = (
+      0x00
+    );
+    (
+      index_character_basename <
+      length_basename
+    );
     ++index_character_basename
   ) {
     basename[
       index_character_basename
-    ] = name[
-      index_basename +
-      index_character_basename
-    ];
+    ] = (
+      name[
+        index_basename +
+        index_character_basename
+      ]
+    );
   }
 
   fprintf(
@@ -96,5 +125,7 @@ void game_of_life_print_usage(
     basename
   );
 
-  free(basename);
+  clic3_memory_free_raw(
+    basename
+  );
 }
