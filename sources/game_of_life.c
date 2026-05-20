@@ -22,6 +22,7 @@
 #if with_metal == 1
 #include <clic3_bytes.h>
 #endif
+#include <clic3_memory.h>
 
 #include <interrupt_handler.h>
 
@@ -35,8 +36,6 @@
 #include <rand_source_type.h>
 #endif
 
-#include <stdlib.h>
-
 #if rendering_mode == 3
 int main(
   int length_parameters,
@@ -44,32 +43,44 @@ int main(
 ) {
   struct game_of_life_parameters game_of_life_parameters;
 
-  unsigned char status_game_of_life_parameters_parse = game_of_life_parameters_parse(
-    &game_of_life_parameters,
-    length_parameters,
-    parameters
+  unsigned char status_game_of_life_parameters_parse = (
+    game_of_life_parameters_parse(
+      &game_of_life_parameters,
+      length_parameters,
+      parameters
+    )
   );
 
   if (
-    status_game_of_life_parameters_parse != 0
+    status_game_of_life_parameters_parse !=
+    0x00
   ) {
     game_of_life_print_usage(
-      parameters[0],
-      1
+      parameters[
+        0x00
+      ],
+      0x01
     );
 
-    return 1;
+    return (
+      0x01
+    );
   }
 
   if (
-    game_of_life_parameters.help == 1
+    game_of_life_parameters.help ==
+    0x01
   ) {
     game_of_life_print_usage(
-      parameters[0],
-      0
+      parameters[
+        0x00
+      ],
+      0x00
     );
 
-    return 0;
+    return (
+      0x00
+    );
   }
 
   return game_of_life_3d_initialize(
@@ -86,40 +97,56 @@ int main(
 ) {
   struct game_of_life_parameters game_of_life_parameters;
 
-  unsigned char status_game_of_life_parameters_parse = game_of_life_parameters_parse(
-    &game_of_life_parameters,
-    length_parameters,
-    parameters
+  unsigned char status_game_of_life_parameters_parse = (
+    game_of_life_parameters_parse(
+      &game_of_life_parameters,
+      length_parameters,
+      parameters
+    )
   );
 
   if (
-    status_game_of_life_parameters_parse != 0
+    status_game_of_life_parameters_parse !=
+    0x00
   ) {
     game_of_life_print_usage(
-      parameters[0],
-      1
+      parameters[
+        0x00
+      ],
+      0x01
     );
 
-    return 1;
+    return (
+      0x01
+    );
   }
 
   if (
-    game_of_life_parameters.help == 1
+    game_of_life_parameters.help ==
+    0x01
   ) {
     game_of_life_print_usage(
-      parameters[0],
-      0
+      parameters[
+        0x00
+      ],
+      0x00
     );
 
-    return 0;
+    return (
+      0x00
+    );
   }
 
   interrupt_handler_initialize();
 
   struct cexil_renderer renderer;
   struct math_c_vector2_unsigned_int size_renderer = {
-    .x = game_of_life_parameters.size.x,
-    .y = game_of_life_parameters.size.y
+    .x = (
+      game_of_life_parameters.size.x
+    ),
+    .y = (
+      game_of_life_parameters.size.y
+    )
   };
 
   cexil_renderer_initialize(
@@ -149,14 +176,30 @@ int main(
 
   #if with_metal == 1
   struct game_of_life_metal_acceleration_data game_of_life_metal_acceleration_data = {
-    .metal_device = (void*)0,
-    .library = (void*)0,
-    .function_compute = (void*)0,
-    .pipeline_state_compute = (void*)0,
-    .error = game_of_life_metal_acceleration_data_error_none,
-    .rand_parameters = &rand_parameters,
-    .rand_result = &rand_result,
-    .rand_source = &rand_source
+    .metal_device = (
+      0x00
+    ),
+    .library = (
+      0x00
+    ),
+    .function_compute = (
+      0x00
+    ),
+    .pipeline_state_compute = (
+      0x00
+    ),
+    .error = (
+      game_of_life_metal_acceleration_data_error_none
+    ),
+    .rand_parameters = &(
+      rand_parameters
+    ),
+    .rand_result = &(
+      rand_result
+    ),
+    .rand_source = &(
+      rand_source
+    )
   };
 
   game_of_life_metal_acceleration_initialize(
@@ -165,13 +208,12 @@ int main(
   );
 
   if (
-    game_of_life_metal_acceleration_data.error != game_of_life_metal_acceleration_data_error_none
+    game_of_life_metal_acceleration_data.error !=
+    game_of_life_metal_acceleration_data_error_none
   ) {
     game_of_life_metal_acceleration_data_error_print(
       game_of_life_metal_acceleration_data.error
     );
-
-    return game_of_life_metal_acceleration_data.error;
 
     game_of_life_destroy(
       &renderer,
@@ -179,6 +221,10 @@ int main(
       &game_of_life_metal_acceleration_data,
       &rand_result,
       &rand_source
+    );
+    
+    return (
+      game_of_life_metal_acceleration_data.error
     );
   }
 
@@ -195,55 +241,88 @@ int main(
     &rand_source
   );
 
-  char** cells_next = malloc(
-    sizeof(unsigned char*) *
-    game_of_life_parameters.size.y
+  char** cells_next = (
+    clic3_memory_allocate_raw(
+      sizeof(
+        void*
+      ) *
+      game_of_life_parameters.size.y
+    )
   );
 
   for (
-    unsigned int index_y = 0;
-    index_y < game_of_life_parameters.size.y;
+    unsigned int index_y = (
+      0x00
+    );
+    (
+      index_y <
+      game_of_life_parameters.size.y
+    );
     ++index_y
   ) {
     cells_next[
       index_y
-    ] = malloc(
-      sizeof(unsigned char) *
-      game_of_life_parameters.size.x
+    ] = (
+      clic3_memory_allocate_raw(
+        game_of_life_parameters.size.x
+      )
     );
   }
   #endif
 
   unsigned int count_generations = (
     game_of_life_parameters.lock_to_generation
-    ? game_of_life_parameters.lock_to_generation - 1
-    : 1
+    ? (
+      game_of_life_parameters.lock_to_generation -
+      0x01
+    )
+    : 0x01
   );
-  unsigned char first_render = 1;
+  
+  unsigned char first_render = (
+    0x01
+  );
 
-  while (interrupt_handler_interrupted == 0) {
+  while (
+    interrupt_handler_interrupted ==
+    0x00
+  ) {
     #if with_metal == 1
     for (
-      unsigned long int index_cell = 0;
-      index_cell < length_cells;
+      unsigned long int index_cell = (
+        0x00
+      );
+      (
+        index_cell <
+        length_cells
+      );
       index_cell = (
         index_cell +
         game_of_life_parameters.size.x
       )
     ) {
       clic3_bytes_copy(
-        renderer.pixels[index_cell / game_of_life_parameters.size.x],
-        game_of_life_metal_acceleration_data.cells + index_cell, (
-          sizeof(unsigned char) *
+        renderer.pixels[
+          index_cell /
           game_of_life_parameters.size.x
-        )
-      );
+        ],
+        (
+          game_of_life_metal_acceleration_data.cells +
+          index_cell
+        ),
+        game_of_life_parameters.size.x      );
     }
     #endif
 
     if (
-      game_of_life_parameters.lock_to_generation < 2 ||
-      first_render == 0
+      (
+        game_of_life_parameters.lock_to_generation <
+        0x02
+      ) ||
+      (
+        first_render ==
+        0x00
+      )
     ) {
       cexil_renderer_render(
         &renderer
@@ -251,7 +330,8 @@ int main(
     }
 
     if (
-      game_of_life_parameters.lock_to_generation != 0
+      game_of_life_parameters.lock_to_generation !=
+      0x00
     ) {
       #if with_metal == 1
       game_of_life_generate_initial_generation(
@@ -276,8 +356,13 @@ int main(
 
     #else
     for (
-      unsigned int index_generated_generation = 0;
-      index_generated_generation < count_generations;
+      unsigned int index_generated_generation = (
+        0x00
+      );
+      (
+        index_generated_generation <
+        count_generations
+      );
       ++index_generated_generation
     ) {
       game_of_life_poll(
@@ -288,7 +373,9 @@ int main(
     }
     #endif
 
-    first_render = 0;
+    first_render = (
+      0x00
+    );
   }
 
   game_of_life_destroy(
@@ -303,7 +390,9 @@ int main(
     &rand_source
   );
 
-  return 0;
+  return (
+    0x00
+  );
 }
 
 #if rendering_mode == 2
@@ -339,8 +428,13 @@ void game_of_life_generate_initial_generation(
   );
 
   for (
-    unsigned int index_y = 0;
-    index_y < game_of_life_parameters->size.y;
+    unsigned int index_y = (
+      0x00
+    );
+    (
+      index_y <
+      game_of_life_parameters->size.y
+    );
     ++index_y
   ) {
     unsigned long int offset_y = (
@@ -349,19 +443,26 @@ void game_of_life_generate_initial_generation(
     );
 
     for (
-      unsigned int index_x = 0;
-      index_x < game_of_life_parameters->size.x;
+      unsigned int index_x = (
+        0x00
+      );
+      (
+        index_x <
+        game_of_life_parameters->size.x
+      );
       ++index_x
     ) {
       cells[
         index_y
       ][
         index_x
-      ] = game_of_life_cell_transform(
-        rand_result->bytes[
-          offset_y +
-          index_x
-        ]
+      ] = (
+        game_of_life_cell_transform(
+          rand_result->bytes[
+            offset_y +
+            index_x
+          ]
+        )
       );
     }
   }
@@ -390,18 +491,23 @@ void game_of_life_destroy(
   );
   #else
   for (
-    unsigned int index_y = 0;
-    index_y < game_of_life_parameters->size.y;
+    unsigned int index_y = (
+      0x00
+    );
+    (
+      index_y <
+      game_of_life_parameters->size.y
+    );
     ++index_y
   ) {
-    free(
+    clic3_memory_free_raw(
       cells_next[
         index_y
       ]
     );
   }
 
-  free(
+  clic3_memory_free_raw(
     cells_next
   );
   #endif

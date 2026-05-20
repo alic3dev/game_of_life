@@ -13,7 +13,8 @@ void game_of_life_3d_on_initialize(
   void* data
 ) {
   struct game_of_life_parameters* game_of_life_parameters = (
-    (struct game_of_life_parameters*) data
+    (struct game_of_life_parameters*)
+    data
   );
 
   metil_library_initialize(
@@ -27,7 +28,9 @@ void game_of_life_3d_on_initialize(
     game_of_life_parameters->fps_display
   );
 
-  metil->rendering_properties.camera.height = 0.0f;
+  metil->rendering_properties.camera.height = (
+    0x00
+  );
 
   struct metil_scene_controller* scene_controller = (
     metil->scene_controller

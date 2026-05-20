@@ -93,9 +93,11 @@ void game_of_life_3d_scene_initialize(
   );
 
   #if with_metal == 1
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data = malloc(
-    sizeof(
-      struct game_of_life_metal_acceleration_data
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data = (
+    clic3_memory_allocate_raw(
+      sizeof(
+        struct game_of_life_metal_acceleration_data
+      )
     )
   );
 
@@ -115,7 +117,9 @@ void game_of_life_3d_scene_initialize(
     0x00
   );
   
-  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->error = game_of_life_metal_acceleration_data_error_none;
+  game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->error = (
+    game_of_life_metal_acceleration_data_error_none
+  );
   
   game_of_life_3d_scene_data->game_of_life_metal_acceleration_data->rand_parameters = &(
     game_of_life_3d_scene_data->rand_parameters
@@ -198,7 +202,9 @@ void game_of_life_3d_scene_initialize(
       )
     );
 
-    game_of_life_3d_scene_data->cells_next[index_y] = (
+    game_of_life_3d_scene_data->cells_next[
+      index_y
+    ] = (
       clic3_memory_allocate_raw(
         game_of_life_3d_scene_data->game_of_life_parameters->size.x
       )
@@ -223,7 +229,7 @@ void game_of_life_3d_scene_initialize(
       scene->length_renderables
     )
   );
-
+ 
   for (
     unsigned int index_renderable = (
       0x00
@@ -402,8 +408,7 @@ void game_of_life_3d_scene_initialize(
     );
   }
   #endif
-}
-
+ }
 #if with_metal != 1
 void game_of_life_generate_initial_generation(
   struct game_of_life_3d_scene_data* game_of_life_3d_scene_data
@@ -475,8 +480,7 @@ void game_of_life_3d_scene_poll(
   struct metil* metil,
   struct metil_scene* scene
 ) {
-  struct game_of_life_3d_scene_data* game_of_life_3d_scene_data = (
-    (struct game_of_life_3d_scene_data*)
+  struct game_of_life_3d_scene_data* game_of_life_3d_scene_data = (    (struct game_of_life_3d_scene_data*)
     scene->data
   );
 
@@ -572,7 +576,8 @@ void game_of_life_3d_scene_poll(
         metil_object->position.z = (
           0x64
         );
-      } else {        metil_object->position.z = (
+      } else {
+        metil_object->position.z = (
           0x6d -
           living_neighbors[
             index_renderable
