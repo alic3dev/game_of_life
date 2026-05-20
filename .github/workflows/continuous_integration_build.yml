@@ -131,7 +131,7 @@ jobs:
         run: cd interrupt_handler && make interrupt_handler_dylib target_device_version=${{ env.target_device_version }}
       - name: make_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        run: cd math_c && make math_c_dylib math_c_object target_device_version=${{ env.target_device_version }}
+        run: cd math_c && make math_c_dylib math_c_object math_c_metalar target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: make_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
         run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version }}
